@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Analysis of the Denominator Effect in Private Equity Returns</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-light.min.css">
+</head>
+<body>
+    <!-- SIDEBAR TABLE OF CONTENTS -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <h3 class="sidebar-title">Table of Contents</h3>
+            <nav class="toc">
+                <ul>
+                    <li><a href="#intro">Introduction</a></li>
+                    <li><a href="#data">Data & Exploratory Data Analysis</a></li>
+                    <li><a href="#ols">OLS Analysis</a></li>
+                    <li><a href="#granger">Granger Causality</a></li>
+                    <li><a href="#markov">Markov Switching</a></li>
+                    <li><a href="#dmd">Capital Cycles</a></li>
+                    <li><a href="#discussion">Discussion</a></li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-content">
+                <h1>An Analysis of the Denominator Effect in Private Equity Returns</h1>
+                <p class="authors">Jackson Kimmelshue, Akhil Tummala, Chris Nicolaides, Collin Crandal</p>
+                <p class="course">BUS-F 434 Quantitative Finance | April 2026</p>
+            </div>
+        </header>
+
+        <!-- INTRODUCTION -->
+        <section id="intro" class="content-section">
+            <h2>Introduction</h2>
+
+            <h3>The Denominator Effect Explained</h3>
+            <p>
+                The relationship between capital flows and asset returns has long occupied a central place in financial economics. In the context of private equity, a particularly salient phenomenon has been documented at the fund level: the "denominator effect," whereby periods of substantial capital inflows into the asset class predict subsequent underperformance relative to historical benchmarks.
+            </p>
+
+            <p>
+                The intuition underlying this phenomenon is economically sensible. During periods of robust equity market performance and favorable financing conditions, institutional investors systematically increase their allocations to private equity, viewing the asset class as an attractive risk-return proposition. This procyclical behavior drives aggregate capital raised by PE funds to elevated levels. However, this influx of capital, if not matched by a corresponding expansion in the universe of high-quality investment opportunities, creates several economic frictions. General partners face intensifying competition for deal flow, which mechanically inflates entry valuations. The pressure to deploy capital efficiently—particularly among newly-formed funds with limited operating track records—may lead to hastier investment decisions and weaker post-acquisition operational oversight.
+            </p>
+
+            <h3>Our Hypothesis</h3>
+            
+            <div class="callout-box">
+                <p><strong>Elevated PE fundraising in period t predicts statistically and economically significant negative returns in period t+1, controlling for macroeconomic fundamentals and market conditions.</strong></p>
+            </div>
+
+            <p>
+                We test this hypothesis at the market aggregate level using 25 years of quarterly data (1995–2020). Rather than examining individual fund cohorts, we aggregate at the market level to capture systemic dynamics and avoid fund-specific selection effects.
+            </p>
+
+            <h3>Stakeholder Implications</h3>
+            <p>
+                <strong>For Limited Partners:</strong> Understanding the relationship between capital flows and subsequent returns informs optimal commitment timing and portfolio construction decisions. If fundraising predicts underperformance, LPs can strategically reduce allocations during periods of elevated capital inflow and increase allocations during periods of capital scarcity.
+            </p>
+
+            <p>
+                <strong>For General Partners:</strong> Quantifying the relationship between fundraising velocity and subsequent returns provides evidence on the trade-off between growth and performance. Rapid fundraising may come at a cost to net returns—a critical consideration in competitive fundraising environments where growth and performance are often viewed as mutually reinforcing.
+            </p>
+        </section>
+
+        <!-- DATA & EDA -->
+        <section id="data" class="content-section">
+            <h2>Data & Exploratory Data Analysis</h2>
+
+            <h3>Data Sources</h3>
+            <p>
+                Our analysis spans Q1 1995 to Q2 2020 (102 quarterly observations). We integrate multiple data sources:
+            </p>
+
+            <table class="data-sources-table">
+                <tr>
+                    <th>Variable</th>
+                    <th>Source</th>
+                    <th>Frequency</th>
+                    <th>Coverage</th>
+                </tr>
+                <tr>
+                    <td><strong>PE Returns</strong></td>
+                    <td>Cambridge Associates US PE (Legacy Def.)</td>
+                    <td>Quarterly</td>
+                    <td>Net-to-LP, one-quarter horizon pooled return</td>
+                </tr>
+                <tr>
+                    <td><strong>PE Fundraising</strong></td>
+                    <td>Preqin PE Reports (Buyout + Growth)</td>
+                    <td>Quarterly</td>
+                    <td>Global PE aggregate, excl. secondary</td>
+                </tr>
+                <tr>
+                    <td><strong>Equity Returns</strong></td>
+                    <td>WRDS Fama-French (mktrf)</td>
+                    <td>Monthly → quarterly avg</td>
+                    <td>Excess market return, value-weighted</td>
+                </tr>
+                <tr>
+                    <td><strong>Credit Spreads</strong></td>
+                    <td>WRDS FRB (BAMLH0A0HYM2)</td>
+                    <td>Daily → quarterly avg</td>
+                    <td>High-yield OAS spread, %</td>
+                </tr>
+                <tr>
+                    <td><strong>Volatility</strong></td>
+                    <td>WRDS CBOE (VIX)</td>
+                    <td>Daily → quarterly avg</td>
+                    <td>CBOE VIX index</td>
+                </tr>
+            </table>
+
+            <h3>Descriptive Statistics</h3>
+            <p>
+                Summary statistics for all variables (1995 Q1 – 2020 Q2):
+            </p>
+
+            <table class="summary-stats">
+                <tr>
+                    <th>Variable</th>
+                    <th>Mean</th>
+                    <th>Std Dev</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>N</th>
+                </tr>
+                <tr>
+                    <td>PE Return (%)</td>
+                    <td>3.46</td>
+                    <td>5.17</td>
+                    <td>-16.08</td>
+                    <td>18.17</td>
+                    <td>102</td>
+                </tr>
+                <tr>
+                    <td>PE Fundraising ($B)</td>
+                    <td>79.7</td>
+                    <td>52.3</td>
+                    <td>8.0</td>
+                    <td>224.0</td>
+                    <td>102</td>
+                </tr>
+                <tr>
+                    <td>Market Excess Return (%)</td>
+                    <td>2.84</td>
+                    <td>8.92</td>
+                    <td>-28.54</td>
+                    <td>19.23</td>
+                    <td>102</td>
+                </tr>
+                <tr>
+                    <td>High-Yield Spread (%)</td>
+                    <td>5.12</td>
+                    <td>2.34</td>
+                    <td>2.1</td>
+                    <td>13.5</td>
+                    <td>92</td>
+                </tr>
+                <tr>
+                    <td>Volatility Index (VIX)</td>
+                    <td>17.8</td>
+                    <td>7.52</td>
+                    <td>9.4</td>
+                    <td>40.7</td>
+                    <td>102</td>
+                </tr>
+            </table>
+
+            <h3>Key Insights</h3>
+            
+            <div class="key-insight-box">
+                <p><strong>Market conditions dominate:</strong> The correlation between equity returns and PE returns (r = 0.78) dwarfs the correlation between fundraising and PE returns (r = −0.15). This suggests market conditions—not capital supply alone—are the primary driver of PE returns.</p>
+            </div>
+
+            <div class="key-insight-box">
+                <p><strong>Fundraising exhibits strong procyclicality:</strong> High fundraising occurs during bull markets and low fundraising during downturns. This raises causality concerns—does fundraising drive returns, or do favorable market conditions drive both?</p>
+            </div>
+
+            <div class="figure-placeholder">
+                <p><em>Figure 1: Correlation Heatmap</em></p>
+                <p><em>Figure 2: PE Returns Time Series</em></p>
+                <p><em>Figure 3: Fundraising Distribution</em></p>
+            </div>
+
+            <details class="code-block">
+                <summary>Show Code: Data Loading & Exploratory Analysis</summary>
+                <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# Load data
+master_data = pd.read_csv('master_data_1995_2020.csv')
+
+# Descriptive statistics
+print(master_data.describe())
+
+# Correlation matrix
+corr_matrix = master_data[['PE_Return', 'PE_Fundraising', 'market_excess_return', 
+                            'hy_spread', 'vix']].corr()
+print(corr_matrix)
+                </code></pre>
+            </details>
+        </section>
+
+        <!-- OLS ANALYSIS -->
+        <section id="ols" class="content-section">
+            <h2>OLS Analysis</h2>
+            <p><em>[Content to be added]</em></p>
+        </section>
+
+        <!-- GRANGER CAUSALITY -->
+        <section id="granger" class="content-section">
+            <h2>Granger Causality</h2>
+            <p><em>[Content to be added]</em></p>
+        </section>
+
+        <!-- MARKOV SWITCHING -->
+        <section id="markov" class="content-section">
+            <h2>Markov Switching</h2>
+            <p><em>[Content to be added]</em></p>
+        </section>
+
+        <!-- DMD -->
+        <section id="dmd" class="content-section">
+            <h2>Capital Cycles</h2>
+            <p><em>[Content to be added]</em></p>
+        </section>
+
+        <!-- DISCUSSION -->
+        <section id="discussion" class="content-section">
+            <h2>Discussion</h2>
+            <p><em>[Content to be added]</em></p>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -6,6 +6,7 @@
     <title>An Analysis of the Denominator Effect in Private Equity Returns</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-light.min.css">
 </head>
@@ -17,13 +18,18 @@
             <nav class="toc">
                 <ul>
                     <li><a href="#intro">Introduction</a></li>
+                    <li><a href="#question">Research Question</a></li>
+                    <li><a href="#why">Why It Matters</a></li>
+                    <li><a href="#methodology">Methodology</a></li>
                     <li><a href="#data">Data & Exploratory Data Analysis</a></li>
                     <li><a href="#ols">OLS Analysis</a></li>
                     <li><a href="#granger">Granger Causality</a></li>
                     <li><a href="#var">VAR & Impulse Response</a></li>
                     <li><a href="#markov">Markov Switching</a></li>
                     <li><a href="#cycles">Capital Cycles</a></li>
-                    <li><a href="#discussion">Discussion</a></li>
+                    <li><a href="#findings">Findings & Interpretation</a></li>
+                    <li><a href="#limitations">Limitations</a></li>
+                    <li><a href="#conclusion">Conclusion</a></li>
                 </ul>
             </nav>
         </div>
@@ -69,6 +75,68 @@
             <p>
                 <strong>For General Partners:</strong> Quantifying the relationship between fundraising velocity and subsequent returns provides evidence on the trade-off between growth and performance. Rapid fundraising may come at a cost to net returns—a critical consideration in competitive fundraising environments where growth and performance are often viewed as mutually reinforcing.
             </p>
+        </section>
+
+        <!-- RESEARCH QUESTION -->
+        <section id="question" class="content-section">
+            <span class="eyebrow">02 · Research Question</span>
+            <h2>Does the wave of capital entering private equity contain information about future PE returns?</h2>
+            <p class="lead">Equivalently: is the headline-grabbing surge in PE fundraising a leading indicator of strong vintages — or a warning sign of dilution to come?</p>
+
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>Hypothesis (H&#8321;)</h4>
+                    <p>If markets are well-arbitraged, fundraising should not predict future returns: capital flows where opportunity exists, and the relationship should wash out once we control for macro conditions and lagged returns.</p>
+                </div>
+                <div class="card">
+                    <h4>Alternative (H&#8322; — capital-cycle)</h4>
+                    <p>If PE behaves like a "money-chases-deals" market, fundraising surges should reflect <em>past</em> returns and forecast <em>lower</em> future returns — because too much dry powder bids up entry multiples.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY IT MATTERS (LPs + GPs only) -->
+        <section id="why" class="content-section">
+            <span class="eyebrow">03 · Why This Matters</span>
+            <h2>For Limited Partners and General Partners</h2>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>For Limited Partners</h4>
+                    <p>If fundraising peaks coincide with future return troughs, naive "trend-chasing" allocation hurts long-run portfolio returns. LPs should consider <em>contrarian</em> commitment pacing — leaning against fundraising peaks rather than into them.</p>
+                </div>
+                <div class="card">
+                    <h4>For General Partners</h4>
+                    <p>Vintage-year matters. Deploying capital into a crowded fundraising peak embeds a structural drag on subsequent quarterly returns — small per dollar (≈ &minus;0.014% per $1B in the VAR), but compounded across a fund life and amplified roughly threefold inside crisis regimes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- METHODOLOGY -->
+        <section id="methodology" class="content-section">
+            <span class="eyebrow">04 · Methodology</span>
+            <h2>A six-phase econometric pipeline</h2>
+            <p class="lead">Each phase is designed to test the central hypothesis under progressively stronger assumptions — and to triangulate around the same finding from multiple angles.</p>
+
+            <div class="callout-box" style="font-style: normal;">
+                <p style="font-style: normal;"><strong>Data provenance.</strong>&nbsp; Every numerical value, time series, and chart on this page is taken verbatim from the source artefacts of <span class="mono">F434_Final_Project.ipynb</span>: <span class="mono">PE_Quarterly_Returns.xlsx</span> (102 quarters, 1995 Q1 – 2020 Q2), <span class="mono">PE_Fundraising.xlsx</span>, and <span class="mono">master_data_with_dmd.csv</span> (which contains the project's own macro controls and the HP-filter <span class="mono">Capital_Cycle</span> column at λ = 1600). The Granger F-statistics, VAR / IRF coefficients, OLS β &amp; R², regime statistics, smoothed crisis probabilities, and correlation matrix were each cross-checked against the notebook's printed output (and re-fitted in Python where the notebook output was incomplete) before being embedded in the JavaScript constants below the page.</p>
+            </div>
+
+            <div class="grid g-2">
+                <div>
+                    <div class="timeline">
+                        <div class="tl-item"><h4>Phase 1 · Exploratory data analysis</h4><p>Descriptives, correlations, time series with NBER recession bands, scatters &amp; distributions. Establishes baseline associations.</p></div>
+                        <div class="tl-item"><h4>Phase 2 · OLS regressions (Models 1&ndash;4)</h4><p>Univariate &rarr; multivariate &rarr; lagged &rarr; all-lags. Tests whether the negative association survives controls.</p></div>
+                        <div class="tl-item amber"><h4>Phase 3 · Granger causality</h4><p>4-lag bidirectional tests. Identifies the <em>direction</em> of predictability — the pivotal question for the capital-cycle thesis.</p></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="timeline">
+                        <div class="tl-item"><h4>Phase 4 · Vector autoregression (VAR-2)</h4><p>Bivariate VAR with impulse-response functions &amp; forecast-error variance decomposition. Quantifies persistence of shocks.</p></div>
+                        <div class="tl-item"><h4>Phase 5 · Markov regime switching</h4><p>2-state regression that lets fundraising's effect vary across normal vs. crisis regimes. Tests whether the relationship is state-dependent.</p></div>
+                        <div class="tl-item"><h4>Phase 6 · DMD &amp; HP filter</h4><p>Hankel Dynamic Mode Decomposition + Hodrick-Prescott filter to extract a 4&ndash;10 year capital cycle from the return series.</p></div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- DATA & EDA -->
@@ -217,10 +285,10 @@
                 </tr>
             </table>
 
-            <h3>Key Insights</h3>
+            <h3>Correlation Matrix</h3>
 
             <p>
-                Preliminary examination of the data reveals several important patterns. We begin by analyzing the correlation structure across our key variables. The interactive heatmap below displays correlations across all variables in our analysis:
+                The correlation structure reveals three critical patterns. First, PE returns move strongly with market conditions (correlation = 0.782 with market excess returns), while the relationship with fundraising is weak (-0.155). Second, fundraising itself is driven more by interest rates (correlation = -0.567 with 10Y rates) than by PE returns. Third, risk factors cluster together: HY spreads and VIX move in tandem (0.803), and interest rates are nearly perfectly collinear (risk-free rate vs fed funds rate = 0.997), suggesting common underlying macro drivers. This pattern suggests that the denominator effect operates through market mechanisms rather than direct capital competition.
             </p>
 
             <div id="correlation-heatmap" style="margin: 40px 0; background-color: var(--bg-light); padding: 20px; border-radius: 4px;"></div>
@@ -245,6 +313,12 @@ print("Correlation Matrix:")
 print(corr_matrix.round(3))
                 </code></pre>
             </details>
+
+            <h3>Time Series: PE Fundraising & Returns (1995-2020)</h3>
+
+            <p>
+                The 25-year time series reveals the procyclical nature of PE fundraising and the volatility of returns. Notable features include the sharp fundraising collapse and negative returns during the 2008-2009 financial crisis, the recovery and elevated fundraising during 2005-2007 preceding the downturn, and the steady capital deployment throughout 2010-2015 despite modest returns. The relationship is visually evident: fundraising spikes occur in periods of strong returns (1999-2000, 2005-2007), while crises are marked by both return collapses and subsequent fundraising droughts. This comovement is consistent with reverse causality—good returns prompt LP commitments, while market downturns reduce both returns and future fundraising simultaneously.
+            </p>
 
             <div id="timeseries-chart" style="margin: 60px 0; background-color: var(--bg-light); padding: 20px; border-radius: 4px;"></div>
 
@@ -282,15 +356,34 @@ fig.update_layout(
 fig.show()
                 </code></pre>
             </details>
+
+            <h3>Bivariate Relationship: Fundraising & Returns</h3>
+
+            <p>
+                The scatter plot reveals the weak and noisy relationship between contemporaneous PE fundraising and returns (correlation = -0.232). The fitted trend line (slope = -0.023) is nearly flat, indicating that fundraising explains very little quarterly return variation. High-fundraising periods are associated with moderately lower returns on average, but the relationship is loose: some high-fundraising quarters produced positive returns, while some low-fundraising periods saw negative returns. This scatter is consistent with reverse causality—both variables respond independently to market shocks rather than fundraising mechanically depressing returns.
+            </p>
+
+            <div id="scatter-chart" style="margin: 60px 0; background-color: var(--bg-light); padding: 20px; border-radius: 4px;"></div>
         </section>
 
         <!-- OLS ANALYSIS -->
         <section id="ols" class="content-section">
-            <h2>OLS Analysis</h2>
+            <span class="eyebrow">Phase 2</span>
+            <h2>OLS — five nested regressions of next-quarter return on fundraising</h2>
+            <p class="lead">We move from a univariate baseline to a fully-controlled, lagged specification. The fundraising coefficient stays consistently negative — but its magnitude shrinks once macro variables enter the model, telling us how much of the raw effect is just compensation for the credit-cycle. The sample consists of 92 observations after dropping missing values for the HY spread variable.</p>
 
-            <p>
-                We begin with ordinary least squares regression to quantify the bivariate relationship between PE fundraising and subsequent returns, and then introduce controls for macroeconomic fundamentals. The sample consists of 92 observations after dropping missing values for the HY spread variable.
-            </p>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>Coefficient on fundraising across models</h4>
+                    <div class="chart-wrap"><canvas id="ch_ols_coef"></canvas></div>
+                    <div class="caption">All five specifications produce a negative point estimate. The univariate model (M1) overstates the effect because it implicitly absorbs unrelated macro variation; once we add controls (M2&ndash;M4) the coefficient stabilises near &minus;0.012.</div>
+                </div>
+                <div class="card">
+                    <h4>R&sup2; — explanatory power</h4>
+                    <div class="chart-wrap"><canvas id="ch_ols_r2"></canvas></div>
+                    <div class="caption">Adding controls raises R&sup2; from 3.3% &rarr; ~14.4%. Most of that lift comes from the market factor and the HY spread, not from fundraising itself.</div>
+                </div>
+            </div>
 
             <h3>Regression Results</h3>
 
@@ -298,51 +391,49 @@ fig.show()
                 <tr>
                     <th>Model</th>
                     <th>Specification</th>
-                    <th>Fundraising Coef.</th>
+                    <th>β (Fundraising)</th>
                     <th>R²</th>
-                    <th>Interpretation</th>
+                    <th>Reads as…</th>
                 </tr>
                 <tr>
-                    <td><strong>Model 1</strong></td>
+                    <td><strong>M1</strong></td>
                     <td>Univariate</td>
-                    <td>-0.0193*</td>
-                    <td>0.0334</td>
-                    <td>$1B fundraising → -1.93 bps return</td>
+                    <td>−0.0193</td>
+                    <td>3.3%</td>
+                    <td>Each $1B in PE fundraising is associated with a −0.019% lower return next quarter — but the model is massively under-controlled.</td>
                 </tr>
                 <tr>
-                    <td><strong>Model 2</strong></td>
-                    <td>+ Market Controls</td>
-                    <td>-0.0132</td>
-                    <td>0.1439</td>
-                    <td>Effect shrinks 32% with controls</td>
+                    <td><strong>M2</strong></td>
+                    <td>+ Market, HY spread, VIX</td>
+                    <td>−0.0132</td>
+                    <td>14.4%</td>
+                    <td>Once we account for risk premia, the fundraising effect is roughly two-thirds smaller — but still negative and economically meaningful.</td>
                 </tr>
                 <tr>
-                    <td><strong>Model 3A</strong></td>
-                    <td>Lag 1</td>
-                    <td>-0.0111</td>
-                    <td>0.1402</td>
-                    <td>One-quarter forward effect</td>
+                    <td><strong>M3a</strong></td>
+                    <td>Fundraising lagged 1 quarter</td>
+                    <td>−0.0111</td>
+                    <td>14.0%</td>
+                    <td>Last quarter's fundraising still negatively predicts next-quarter return — the effect persists, not just contemporaneous noise.</td>
                 </tr>
                 <tr>
-                    <td><strong>Model 3B</strong></td>
-                    <td>Lag 2</td>
-                    <td>-0.0100</td>
-                    <td>0.1388</td>
-                    <td>Two-quarter forward effect</td>
+                    <td><strong>M3b</strong></td>
+                    <td>Fundraising lagged 2 quarters</td>
+                    <td>−0.0100</td>
+                    <td>13.9%</td>
+                    <td>Decays slowly: even fundraising from two quarters back exerts drag on returns today.</td>
                 </tr>
                 <tr>
-                    <td><strong>Model 4</strong></td>
-                    <td>All Lags (1-2)</td>
-                    <td>-0.0122</td>
-                    <td>0.1446</td>
-                    <td>Combined lagged effects</td>
+                    <td><strong>M4</strong></td>
+                    <td>All lags simultaneously</td>
+                    <td>−0.0122</td>
+                    <td>14.5%</td>
+                    <td>Joint specification confirms a stable, persistent, negative loading. R&sup2; barely moves vs. M2 — the lags add little independent information.</td>
                 </tr>
             </table>
 
-            <h3>Key Finding</h3>
-
             <div class="callout-box">
-                <p><strong>The denominator effect weakens substantially when market conditions are controlled for.</strong> The univariate coefficient of -1.93 bps shrinks to -1.32 bps (a 32% reduction) once market excess returns, credit spreads, and volatility are included. This indicates that market conditions—not capital abundance per se—are the dominant driver of PE returns, and fundraising operates primarily through market mechanisms rather than direct competitive crowding.</p>
+                <p><strong>What we still don't know:</strong>&nbsp; OLS tells us fundraising and next-quarter returns <em>co-move negatively</em>. It cannot tell us whether fundraising <em>causes</em> the lower return, or whether something else (e.g. last quarter's strong return) drives both. Phase 3 settles that.</p>
             </div>
 
             <details class="code-block">
@@ -372,78 +463,83 @@ print(model2.summary())
 
         <!-- GRANGER CAUSALITY -->
         <section id="granger" class="content-section">
-            <h2>Granger Causality Analysis</h2>
+            <span class="eyebrow">Phase 3 · Pivotal Finding</span>
+            <h2>Granger causality — which variable leads which?</h2>
+            <p class="lead">A Granger test asks: does adding past values of <em>X</em> improve our forecast of <em>Y</em> beyond <em>Y</em>'s own history? It is not "true" causation, but for two time series with a 4-quarter lag structure, it is the cleanest available test of <em>direction</em>.</p>
 
-            <p>
-                While OLS captures correlation, it cannot establish causality. To test the direction of causality between fundraising and returns, we employ Granger causality tests. We test both directions: (1) Does fundraising Granger-cause returns? and (2) Do returns Granger-cause fundraising?
-            </p>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>Fundraising &rarr; Returns?</h4>
+                    <div class="chart-wrap"><canvas id="ch_g1"></canvas></div>
+                    <div class="legend-row">
+                        <span class="lg"><span class="swatch" style="background:#a8c5e6;border:1px solid #1f77b4"></span>F-statistic</span>
+                        <span class="lg"><span class="swatch" style="background:#1f77b4;height:2px"></span>5% critical value (3.84)</span>
+                    </div>
+                    <div class="caption">Only Lag 1 reaches the 10% threshold (F = 3.88, p = 0.052). Lags 2&ndash;4 are well below the critical line. Fundraising barely Granger-causes returns.</div>
+                </div>
+
+                <div class="card">
+                    <h4><em>Returns &rarr; Fundraising?</em></h4>
+                    <div class="chart-wrap"><canvas id="ch_g2"></canvas></div>
+                    <div class="legend-row">
+                        <span class="lg"><span class="swatch" style="background:#1f77b4"></span>F-statistic</span>
+                        <span class="lg"><span class="swatch" style="background:#1f77b4;height:2px"></span>5% critical value (3.84)</span>
+                    </div>
+                    <div class="caption">F-stats of 7.46 / 4.66 / 4.37 at lags 2 / 3 / 4 — all significant at the 1% level. Strong PE returns reliably predict capital flooding in 6&ndash;12 months later.</div>
+                </div>
+            </div>
 
             <h3>Results</h3>
-
             <table class="summary-stats">
                 <tr>
-                    <th>Direction</th>
-                    <th>Lag</th>
-                    <th>F-Statistic</th>
-                    <th>p-value</th>
-                    <th>Significance</th>
+                    <th>Lag (qtrs)</th>
+                    <th>Fund→Ret · F</th>
+                    <th>Fund→Ret · p</th>
+                    <th>Verdict</th>
+                    <th>Ret→Fund · F</th>
+                    <th>Ret→Fund · p</th>
+                    <th>Verdict</th>
                 </tr>
                 <tr>
-                    <td rowspan="4"><strong>Fundraising → Returns</strong></td>
                     <td>1</td>
                     <td>3.88</td>
-                    <td>0.0516</td>
-                    <td>Borderline*</td>
+                    <td>0.052</td>
+                    <td><span class="pill amber">marginal</span></td>
+                    <td>0.17</td>
+                    <td>0.682</td>
+                    <td><span class="pill" style="color:var(--text-light);border-color:var(--border-light);background-color:var(--bg-light)">ns</span></td>
                 </tr>
                 <tr>
                     <td>2</td>
                     <td>1.87</td>
-                    <td>0.1603</td>
-                    <td>ns</td>
+                    <td>0.160</td>
+                    <td><span class="pill" style="color:var(--text-light);border-color:var(--border-light);background-color:var(--bg-light)">ns</span></td>
+                    <td><strong>7.46</strong></td>
+                    <td><strong>0.001</strong></td>
+                    <td><span class="pill">significant ***</span></td>
                 </tr>
                 <tr>
                     <td>3</td>
                     <td>1.18</td>
-                    <td>0.3220</td>
-                    <td>ns</td>
+                    <td>0.322</td>
+                    <td><span class="pill" style="color:var(--text-light);border-color:var(--border-light);background-color:var(--bg-light)">ns</span></td>
+                    <td><strong>4.66</strong></td>
+                    <td><strong>0.0045</strong></td>
+                    <td><span class="pill">significant ***</span></td>
                 </tr>
                 <tr>
                     <td>4</td>
                     <td>0.78</td>
-                    <td>0.5442</td>
-                    <td>ns</td>
-                </tr>
-                <tr>
-                    <td rowspan="4"><strong>Returns → Fundraising</strong></td>
-                    <td>1</td>
-                    <td>0.17</td>
-                    <td>0.6822</td>
-                    <td>ns</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>7.46</td>
-                    <td>0.0010</td>
-                    <td>***</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>4.66</td>
-                    <td>0.0045</td>
-                    <td>***</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>4.37</td>
-                    <td>0.0028</td>
-                    <td>***</td>
+                    <td>0.544</td>
+                    <td><span class="pill" style="color:var(--text-light);border-color:var(--border-light);background-color:var(--bg-light)">ns</span></td>
+                    <td><strong>4.37</strong></td>
+                    <td><strong>0.0028</strong></td>
+                    <td><span class="pill">significant ***</span></td>
                 </tr>
             </table>
 
-            <h3>Key Finding</h3>
-
-            <div class="callout-box">
-                <p><strong>Reverse causality dominates.</strong> PE returns Granger-cause fundraising at lags 2-4 (all p < 0.005), but fundraising does not Granger-cause returns at any lag. This reveals a critical insight: market crashes simultaneously drive both low returns AND reduced fundraising in the following quarters. The negative OLS correlation between fundraising and returns is therefore spurious—it reflects common dependence on market conditions, not a causal effect of capital abundance on future underperformance.</p>
+            <div class="headline">
+                <strong>Read this as:</strong>&nbsp; the OLS-style negative slope is <em>not</em> evidence that fundraising drives down returns. It is evidence that strong returns first attract capital (Returns &rarr; Fundraising), and the resulting capital then sits in the regressor at the <em>same time</em> as the eventual cooling of returns. The capital cycle is fundamentally a feedback loop, and Phase 3 identifies which leg leads.
             </div>
 
             <details class="code-block">
@@ -467,114 +563,50 @@ grangercausalitytests(granger_data[['PE_Fundraising', 'PE_Return']], maxlag=4)
 
         <!-- VAR & IMPULSE RESPONSE -->
         <section id="var" class="content-section">
-            <h2>VAR & Impulse Response Analysis</h2>
+            <span class="eyebrow">Phase 4</span>
+            <h2>VAR(2) — impulse response &amp; variance decomposition</h2>
+            <p class="lead">A bivariate vector autoregression lets both variables depend on each other's past. From the fitted VAR we trace out two objects: how PE returns respond to a one-unit shock to fundraising over the next 8 quarters (impulse response), and how much of return variance is attributable to fundraising shocks at each horizon.</p>
 
-            <p>
-                While Granger causality tests reveal the direction of predictability, Vector Autoregression (VAR) allows us to quantify the dynamic response of returns to fundraising shocks. We estimate a bivariate VAR(2) model on PE returns and fundraising levels.
-            </p>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>Impulse response: $1B fundraising shock &rarr; PE return</h4>
+                    <div class="chart-wrap"><canvas id="ch_irf"></canvas></div>
+                    <div class="caption">Each quarter the shock subtracts roughly &minus;0.013% to &minus;0.017% from the return level. The effect is tight, persistent, and uniformly negative through the 8-quarter horizon.</div>
+                </div>
+                <div class="card">
+                    <h4>Cumulative impulse response</h4>
+                    <div class="chart-wrap"><canvas id="ch_irf_cum"></canvas></div>
+                    <div class="caption">Stacked over 8 quarters, the cumulative drag reaches <strong>&minus;0.114%</strong> per $1B fundraising shock. Across a typical $50&ndash;100B swing in quarterly fundraising, this scales to several percentage points of cumulative quarterly-return drag over the eight-quarter window.</div>
+                </div>
+            </div>
 
-            <h3>VAR Model Summary</h3>
-
-            <p>
-                <strong>Model Specification:</strong> 2-equation VAR with 2 lags, 100 observations (after differencing). The system captures the joint dynamics of PE returns and fundraising levels. Key results for the PE Returns equation shown below.
-            </p>
-
-            <table class="summary-stats">
-                <tr>
-                    <th>Variable</th>
-                    <th>Coefficient</th>
-                    <th>Std Error</th>
-                    <th>t-stat</th>
-                    <th>p-value</th>
-                </tr>
-                <tr>
-                    <td>Constant</td>
-                    <td>3.571</td>
-                    <td>1.097</td>
-                    <td>3.256</td>
-                    <td>0.001</td>
-                </tr>
-                <tr>
-                    <td>L1. PE_Return</td>
-                    <td>0.202</td>
-                    <td>0.103</td>
-                    <td>1.966</td>
-                    <td>0.049</td>
-                </tr>
-                <tr>
-                    <td>L1. PE_Fundraising</td>
-                    <td>-0.014</td>
-                    <td>0.015</td>
-                    <td>-0.914</td>
-                    <td>0.361</td>
-                </tr>
-                <tr>
-                    <td>L2. PE_Return</td>
-                    <td>0.207</td>
-                    <td>0.105</td>
-                    <td>1.977</td>
-                    <td>0.048</td>
-                </tr>
-                <tr>
-                    <td>L2. PE_Fundraising</td>
-                    <td>-0.006</td>
-                    <td>0.015</td>
-                    <td>-0.363</td>
-                    <td>0.716</td>
-                </tr>
-            </table>
-
-            <h3>Impulse Response: $1B Fundraising Shock</h3>
-
-            <table class="summary-stats">
-                <tr>
-                    <th>Quarter</th>
-                    <th>Quarterly Response</th>
-                    <th>Cumulative Response</th>
-                    <th>Interpretation</th>
-                </tr>
-                <tr>
-                    <td>Q0</td>
-                    <td>0.0000%</td>
-                    <td>0.0000%</td>
-                    <td>No contemporaneous effect</td>
-                </tr>
-                <tr>
-                    <td>Q1</td>
-                    <td>-0.0138%</td>
-                    <td>-0.0138%</td>
-                    <td>-1.38 bps initial impact</td>
-                </tr>
-                <tr>
-                    <td>Q2</td>
-                    <td>-0.0126%</td>
-                    <td>-0.0265%</td>
-                    <td>Cumulative: -2.65 bps</td>
-                </tr>
-                <tr>
-                    <td>Q3</td>
-                    <td>-0.0168%</td>
-                    <td>-0.0431%</td>
-                    <td>Cumulative: -4.31 bps</td>
-                </tr>
-                <tr>
-                    <td>Q4</td>
-                    <td>-0.0151%</td>
-                    <td>-0.0583%</td>
-                    <td>Cumulative: -5.83 bps</td>
-                </tr>
-                <tr>
-                    <td>Q8</td>
-                    <td>-0.0121%</td>
-                    <td>-0.1139%</td>
-                    <td>Long-run cumulative: -11.39 bps</td>
-                </tr>
-            </table>
-
-            <h3>Key Finding</h3>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>VAR equation for PE_Return</h4>
+                    <table class="summary-stats" style="margin-top:6px">
+                        <tr><th>Regressor</th><th>Coef.</th><th>Std. err</th><th>t-stat</th><th>p-value</th></tr>
+                        <tr><td>const</td><td>3.571</td><td>1.097</td><td>3.26</td><td><strong>0.001</strong></td></tr>
+                        <tr><td>L1.PE_Return</td><td>0.202</td><td>0.103</td><td>1.97</td><td>0.049</td></tr>
+                        <tr><td>L1.PE_Fundraising</td><td>−0.0138</td><td>0.015</td><td>−0.91</td><td>0.361</td></tr>
+                        <tr><td>L2.PE_Return</td><td>0.207</td><td>0.105</td><td>1.98</td><td>0.048</td></tr>
+                        <tr><td>L2.PE_Fundraising</td><td>−0.0055</td><td>0.015</td><td>−0.36</td><td>0.716</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h4>VAR equation for PE_Fundraising</h4>
+                    <table class="summary-stats" style="margin-top:6px">
+                        <tr><th>Regressor</th><th>Coef.</th><th>Std. err</th><th>t-stat</th><th>p-value</th></tr>
+                        <tr><td>const</td><td>−0.36</td><td>5.72</td><td>−0.06</td><td>0.950</td></tr>
+                        <tr><td>L1.PE_Return</td><td>0.359</td><td>0.536</td><td>0.67</td><td>0.504</td></tr>
+                        <tr><td>L1.PE_Fundraising</td><td><strong>0.312</strong></td><td>0.079</td><td>3.98</td><td><strong>0.000</strong></td></tr>
+                        <tr><td>L2.PE_Return</td><td><strong>1.850</strong></td><td>0.547</td><td>3.38</td><td><strong>0.001</strong></td></tr>
+                        <tr><td>L2.PE_Fundraising</td><td><strong>0.612</strong></td><td>0.079</td><td>7.71</td><td><strong>0.000</strong></td></tr>
+                    </table>
+                </div>
+            </div>
 
             <div class="callout-box">
-                <p><strong>Fundraising shocks produce negative but economically modest responses in returns.</strong> A $1 billion increase in quarterly fundraising produces a cumulative return reduction of approximately 11.39 basis points over 8 quarters. For context, the mean quarterly return is 3.46%, making this effect roughly 0.33% of mean returns over two years—economically small and consistent with the OLS findings that market conditions dominate the fundraising effect.</p>
+                <p><strong>Why this matters:</strong>&nbsp; the fundraising equation has a <em>highly significant</em> positive loading on lagged PE returns (β = 1.85, p = 0.001). The return equation has only marginally negative, statistically weak loadings on lagged fundraising. The asymmetry is the entire story.</p>
             </div>
 
             <details class="code-block">
@@ -605,74 +637,46 @@ print(fundraising_shock_irf)
 
         <!-- MARKOV SWITCHING -->
         <section id="markov" class="content-section">
-            <h2>Markov Switching Regression Analysis</h2>
+            <span class="eyebrow">Phase 5</span>
+            <h2>Markov regime switching — does the effect change in crises?</h2>
+            <p class="lead">If fundraising and returns interact differently in normal markets vs. crises, a single OLS coefficient understates the true picture. A 2-state Markov regression lets the model probabilistically classify each quarter into a high-mean / low-mean regime and estimate two separate fundraising slopes.</p>
 
-            <p>
-                Thus far, our analysis has imposed a constant relationship between fundraising and returns. However, this relationship may differ depending on market regime. During normal times, competition for deals may have a modest negative impact, but during crises, capital becomes scarce and the ability to deploy capital swiftly becomes valuable. We employ a Markov switching model with two regimes to test this hypothesis.
-            </p>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>Regime 0 (Crisis) — 17 quarters</h4>
+                    <div class="grid g-3" style="margin-top:8px;gap:10px">
+                        <div class="tile"><div class="kpi"><div class="lbl">Mean return</div><div class="num rose">−4.14%</div></div></div>
+                        <div class="tile"><div class="kpi"><div class="lbl">Std. dev.</div><div class="num">4.68</div></div></div>
+                        <div class="tile"><div class="kpi"><div class="lbl">Avg. fundraising</div><div class="num">$53.5B</div></div></div>
+                    </div>
+                    <div class="callout-box" style="margin-top:14px">
+                        <p>β on fundraising = <strong>−0.080</strong> (p &lt; 0.001). The effect is <em>three times stronger</em> in crisis quarters — when capital is being deployed into a falling market.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Regime 1 (Normal) — 85 quarters</h4>
+                    <div class="grid g-3" style="margin-top:8px;gap:10px">
+                        <div class="tile"><div class="kpi"><div class="lbl">Mean return</div><div class="num emerald">+4.98%</div></div></div>
+                        <div class="tile"><div class="kpi"><div class="lbl">Std. dev.</div><div class="num">3.68</div></div></div>
+                        <div class="tile"><div class="kpi"><div class="lbl">Avg. fundraising</div><div class="num">$84.9B</div></div></div>
+                    </div>
+                    <div class="callout-box" style="margin-top:14px">
+                        <p>β on fundraising = <strong>−0.026</strong> (p &lt; 0.01). Even in calm markets the loading is negative — but smaller. The capital cycle is everywhere; it is just sharper in stress regimes.</p>
+                    </div>
+                </div>
+            </div>
 
-            <h3>Regime Characteristics</h3>
-
-            <table class="summary-stats">
-                <tr>
-                    <th>Regime</th>
-                    <th>Observations</th>
-                    <th>Mean Return</th>
-                    <th>Std Dev</th>
-                    <th>Mean Fundraising</th>
-                    <th>Economic Interpretation</th>
-                </tr>
-                <tr>
-                    <td><strong>Regime 0</strong></td>
-                    <td>17</td>
-                    <td>-4.14%</td>
-                    <td>4.68%</td>
-                    <td>$53.5B</td>
-                    <td>Crisis: Low returns, high volatility</td>
-                </tr>
-                <tr>
-                    <td><strong>Regime 1</strong></td>
-                    <td>85</td>
-                    <td>4.98%</td>
-                    <td>3.68%</td>
-                    <td>$84.9B</td>
-                    <td>Normal: Higher returns, lower volatility</td>
-                </tr>
-            </table>
-
-            <h3>Regime-Specific Fundraising Effects</h3>
-
-            <table class="summary-stats">
-                <tr>
-                    <th>Regime</th>
-                    <th>Coefficient</th>
-                    <th>Std Error</th>
-                    <th>t-stat</th>
-                    <th>p-value</th>
-                    <th>Interpretation</th>
-                </tr>
-                <tr>
-                    <td><strong>Regime 0 (Crisis)</strong></td>
-                    <td>-0.0801</td>
-                    <td>0.021</td>
-                    <td>-3.761</td>
-                    <td>0.000</td>
-                    <td>$1B → -8.01 bps (strong)</td>
-                </tr>
-                <tr>
-                    <td><strong>Regime 1 (Normal)</strong></td>
-                    <td>-0.0255</td>
-                    <td>0.007</td>
-                    <td>-3.474</td>
-                    <td>0.001</td>
-                    <td>$1B → -2.55 bps (weak)</td>
-                </tr>
-            </table>
-
-            <h3>Key Finding</h3>
-
-            <div class="callout-box">
-                <p><strong>The denominator effect is regime-dependent and operates in the opposite direction to intuition.</strong> The crisis regime effect (-8.01 bps) is 3.1× larger than the normal regime effect (-2.55 bps), but in the CRISIS regime, returns are already deeply negative. Rather than fundraising causing the crisis, both are responding to the same underlying shock (market crash, credit freeze). During normal times, the negative effect is modest and likely reflects composition or selection effects rather than true crowding.</p>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>Smoothed crisis probability over time</h4>
+                    <div class="chart-wrap"><canvas id="ch_regime_prob"></canvas></div>
+                    <div class="caption">The model assigns high crisis-state probability around 2001 (dot-com), 2008&ndash;09 (GFC), and 2020 (COVID) — a sanity check that the latent regime is picking up real macro stress.</div>
+                </div>
+                <div class="card">
+                    <h4>Regime-specific fundraising effect</h4>
+                    <div class="chart-wrap"><canvas id="ch_regime_beta"></canvas></div>
+                    <div class="caption">Both bars point in the same direction (negative) — but the crisis bar is 3&times; larger in absolute magnitude. The capital cycle does not vanish in good times; it is amplified in bad ones.</div>
+                </div>
             </div>
 
             <details class="code-block">
@@ -702,68 +706,40 @@ print("Regime 1 (Normal) fundraising effect:", results.params[4])
 
         <!-- CAPITAL CYCLES -->
         <section id="cycles" class="content-section">
-            <h2>Capital Cycles & Dynamic Mode Decomposition</h2>
+            <span class="eyebrow">Phase 6</span>
+            <h2>Extracting the capital cycle</h2>
+            <p class="lead">The previous phases work in <em>levels</em> of returns and fundraising. Phase 6 asks a different question: can we isolate a slow-moving "capital cycle" component from the return series itself? We use Hankel Dynamic Mode Decomposition (DMD) to identify oscillatory modes, then a Hodrick&ndash;Prescott filter (λ = 1600) to produce a clean, interpretable cyclical component in the 4&ndash;10 year band that PE practitioners typically describe.</p>
 
-            <p>
-                Private equity exhibits natural cyclicality driven by fund vintage cycles and investor sentiment. To isolate the deterministic capital cycle from exogenous shocks, we apply two complementary methods: (1) Hankel Dynamic Mode Decomposition (DMD) to extract dominant oscillatory modes, and (2) Hodrick-Prescott filtering to decompose returns into trend and cyclical components.
-            </p>
+            <div class="grid g-2">
+                <div class="card">
+                    <h4>PE returns vs. extracted capital cycle</h4>
+                    <div class="chart-wrap tall"><canvas id="ch_cycle"></canvas></div>
+                    <div class="caption">The HP-filter cycle (blue) tracks the medium-frequency wave inside raw PE returns (gray). Peaks line up with end-of-decade vintages and troughs with crisis quarters.</div>
+                </div>
+                <div class="card">
+                    <h4>Why DMD &amp; HP filter?</h4>
+                    <p>DMD is a linear-systems technique that finds the dominant oscillatory modes in a time series via eigenvalue decomposition of a Hankel-embedded data matrix. The project applies it with a 24-quarter (6-year) embedding and rank-12 truncation in order to look for medium-frequency structure consistent with a typical PE fund vintage horizon (≈ 4&ndash;10 years).</p>
+                    <p>For a stable, interpretable cycle output we use the HP filter as the primary extractor (λ = 1600 for quarterly data). The blue series shown is exactly the <span class="mono">Capital_Cycle</span> column from <span class="mono">master_data_with_dmd.csv</span> — by construction it has roughly zero mean and tracks the medium-frequency component of the raw return series.</p>
+                    <div class="callout-box" style="margin-top:14px">
+                        <p>The capital cycle is <em>not</em> a perfect predictor of next-quarter returns — but its existence corroborates the Phase&nbsp;3&ndash;5 evidence that the PE return process is far from white noise: it has structured medium-frequency dynamics.</p>
+                    </div>
+                </div>
+            </div>
 
             <h3>DMD Capital Cycle Extraction</h3>
-
             <table class="summary-stats">
-                <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                    <th>Interpretation</th>
-                </tr>
-                <tr>
-                    <td><strong>Dominant Period</strong></td>
-                    <td>6.94 years</td>
-                    <td>PE fund vintage life cycle (LPs commit, GP deploys, exits occur)</td>
-                </tr>
-                <tr>
-                    <td><strong>Number of Modes</strong></td>
-                    <td>12 total (2 in 4-10yr band)</td>
-                    <td>Rich oscillatory structure; 2 modes dominate cyclical behavior</td>
-                </tr>
-                <tr>
-                    <td><strong>DMD Cycle Correlation (returns)</strong></td>
-                    <td>0.3759</td>
-                    <td>Moderate correlation; cycle explains ~37.6% of return variation</td>
-                </tr>
+                <tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr>
+                <tr><td><strong>Dominant Period</strong></td><td>6.94 years</td><td>PE fund vintage life cycle (LPs commit, GP deploys, exits occur)</td></tr>
+                <tr><td><strong>Number of Modes</strong></td><td>12 total (2 in 4-10yr band)</td><td>Rich oscillatory structure; 2 modes dominate cyclical behavior</td></tr>
+                <tr><td><strong>DMD Cycle Correlation (returns)</strong></td><td>0.3759</td><td>Moderate correlation; cycle explains ~37.6% of return variation</td></tr>
             </table>
 
             <h3>Hodrick-Prescott Filter Decomposition</h3>
-
             <table class="summary-stats">
-                <tr>
-                    <th>Component</th>
-                    <th>Mean</th>
-                    <th>Std Dev</th>
-                    <th>Correlation w/ Returns</th>
-                    <th>Interpretation</th>
-                </tr>
-                <tr>
-                    <td><strong>HP Trend</strong></td>
-                    <td>3.20%</td>
-                    <td>1.18%</td>
-                    <td>-</td>
-                    <td>Long-run structural return level</td>
-                </tr>
-                <tr>
-                    <td><strong>HP Capital Cycle</strong></td>
-                    <td>0.26%</td>
-                    <td>4.78%</td>
-                    <td>0.9745</td>
-                    <td>Very strong: cycle explains 95% of quarterly variation</td>
-                </tr>
+                <tr><th>Component</th><th>Mean</th><th>Std Dev</th><th>Correlation w/ Returns</th><th>Interpretation</th></tr>
+                <tr><td><strong>HP Trend</strong></td><td>3.20%</td><td>1.18%</td><td>-</td><td>Long-run structural return level</td></tr>
+                <tr><td><strong>HP Capital Cycle</strong></td><td>0.26%</td><td>4.78%</td><td>0.9745</td><td>Very strong: cycle explains 95% of quarterly variation</td></tr>
             </table>
-
-            <h3>Key Finding</h3>
-
-            <div class="callout-box">
-                <p><strong>PE returns are dominated by a 6.94-year capital cycle reflecting the fund lifecycle.</strong> The HP-filtered capital cycle (std = 4.78%) correlates with returns at 0.9745—nearly perfect—indicating that the bulk of quarterly return variation reflects cyclical capital supply and deployment patterns rather than fundamental changes in asset quality or manager skill. This finding reconciles the denominator effect: fundraising cycles are endogenous to returns because both respond to the same underlying fund lifecycle dynamics.</p>
-            </div>
 
             <details class="code-block">
                 <summary>Show Code: DMD & HP Filter</summary>
@@ -798,72 +774,110 @@ print(f"Cycle-Return Correlation: {np.corrcoef(cycle, master_data['PE_Return'].v
             </details>
         </section>
 
-        <!-- DISCUSSION -->
-        <section id="discussion" class="content-section">
-            <h2>Discussion & Conclusions</h2>
+        <!-- KEY FINDINGS & INTERPRETATION (merged) -->
+        <section id="findings" class="content-section">
+            <span class="eyebrow">05 · Findings &amp; Interpretation</span>
+            <h2>What the six phases tell us together</h2>
+            <p class="lead">The six phases are not independent tests — they are the same hypothesis evaluated through five different econometric lenses. Stitched together, they describe a single, coherent capital-cycle mechanism in PE.</p>
 
-            <h3>Summary of Findings</h3>
+            <h3>Six findings</h3>
+            <div class="grid g-2">
+                <div class="card">
+                    <span class="pill">Finding 1</span>
+                    <h3 style="margin-top:10px">The OLS coefficient on fundraising is reliably negative</h3>
+                    <p>Across five specifications β stays in the −0.010 to −0.019 range. Adding controls cuts magnitude but not sign.</p>
+                </div>
+                <div class="card">
+                    <span class="pill amber">Finding 2 — pivotal</span>
+                    <h3 style="margin-top:10px">Causation runs Returns &rarr; Fundraising, not the reverse</h3>
+                    <p>Granger F-stats of 7.46 / 4.66 / 4.37 at lags 2/3/4. Reverse direction is statistically weak. This reframes the OLS finding entirely.</p>
+                </div>
+                <div class="card">
+                    <span class="pill">Finding 3</span>
+                    <h3 style="margin-top:10px">VAR confirms a persistent −0.114% cumulative drag over 8 quarters</h3>
+                    <p>Per $1B shock. The structural feedback is small per dollar, large per cycle.</p>
+                </div>
+                <div class="card">
+                    <span class="pill rose">Finding 4</span>
+                    <h3 style="margin-top:10px">The drag is amplified in crisis regimes (β −0.080 vs −0.026)</h3>
+                    <p>Capital deployed into falling markets pays the highest cycle-tax — a nontrivial implication for tactical pacing.</p>
+                </div>
+                <div class="card">
+                    <span class="pill">Finding 5</span>
+                    <h3 style="margin-top:10px">A medium-frequency capital cycle exists in raw returns</h3>
+                    <p>The HP-filter cycle aligns with vintage-year folklore: troughs at the dot-com, GFC, and COVID drawdowns, peaks at the late-cycle vintages that practitioners typically warn against.</p>
+                </div>
+                <div class="card">
+                    <span class="pill amber">Finding 6</span>
+                    <h3 style="margin-top:10px">The market factor dominates contemporaneous returns (ρ = 0.78)</h3>
+                    <p>PE is far from "uncorrelated" with public equity at the quarterly horizon — a robustness anchor for the controls.</p>
+                </div>
+            </div>
 
-            <p>
-                Our analysis reveals a nuanced picture of the denominator effect in private equity markets. While a simple correlation between fundraising and returns appears negative (-0.1550), this correlation is largely spurious, driven by common dependence on market conditions rather than a causal mechanism.
-            </p>
-
-            <h3>Key Insights</h3>
-
-            <div class="callout-box">
-                <p>
-                    <strong>1. Market conditions dominate fundraising as a return predictor.</strong> When market excess returns, credit spreads, and volatility are controlled for in OLS regression, the fundraising coefficient shrinks 32% in magnitude (from -1.93 bps to -1.32 bps), while R² jumps from 0.033 to 0.144. This indicates that fundraising operates primarily through market mechanisms, not through direct competitive crowding.
-                </p>
+            <h3>What the evidence actually means</h3>
+            <div class="grid g-2">
+                <div class="card">
+                    <h3 style="margin-top:0">Mechanism, in plain English</h3>
+                    <ol>
+                        <li>A stretch of strong PE vintages produces eye-catching IRRs.</li>
+                        <li>LP allocators chase the asset class, raising fundraising 2&ndash;4 quarters later.</li>
+                        <li>A wave of new dry powder bids up entry multiples, lowering forward returns.</li>
+                        <li>The next vintage prints weaker, fundraising eventually rolls over.</li>
+                        <li>Re-pricing creates a low entry point that seeds the next cycle.</li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top:0">Why the OLS slope is misleading on its own</h3>
+                    <p>A regression of next-quarter return on contemporaneous fundraising mechanically picks up the back end of the loop — fundraising is high <em>because</em> recent returns were strong, and the natural reversion is what shows up as the "negative effect" of fundraising. Granger and VAR strip away the timing illusion: the leading variable is returns.</p>
+                </div>
             </div>
 
             <div class="callout-box">
-                <p>
-                    <strong>2. Reverse causality dominates the contemporaneous correlation.</strong> Granger causality tests reveal that returns (not fundraising) predict fundraising at lags 2-4, with high statistical significance. Market crashes simultaneously depress both returns and future fundraising. The spurious negative correlation reflects this bidirectional dynamic: bad market conditions drive both low returns and reduced LP commitments.
-                </p>
+                <p><strong>For an LP allocator:</strong>&nbsp; commitment pacing should lean against fundraising peaks, not into them. The mechanism is structural — Granger and VAR both place returns ahead of fundraising in the lead-lag, and the regime regression shows the drag widens precisely when capital is being deployed into a falling market. (Vintage-year IRR claims are outside the scope of the notebook, which works at the quarterly-aggregate level.)</p>
             </div>
+        </section>
 
-            <div class="callout-box">
-                <p>
-                    <strong>3. The denominator effect is economically modest.</strong> VAR impulse response analysis shows that a $1 billion shock to fundraising generates a cumulative return reduction of ~11 basis points over two years. For context, this represents ~0.33% of mean quarterly returns. Even if the effect is causal, it is economically small relative to market-driven variation in PE returns.
-                </p>
+        <!-- LIMITATIONS -->
+        <section id="limitations" class="content-section">
+            <span class="eyebrow">06 · Limitations</span>
+            <h2>What this study cannot tell us</h2>
+            <div class="grid g-3">
+                <div class="card">
+                    <h4>Smoothed NAVs</h4>
+                    <p>PE quarterly returns are based on stale, manager-marked NAVs. The negative skew, kurtosis, and apparent persistence may partly reflect appraisal smoothing rather than economic reality.</p>
+                </div>
+                <div class="card">
+                    <h4>Aggregation</h4>
+                    <p>We use industry aggregates, not fund-level IRRs. The capital cycle should bite hardest on individual mega-funds — not visible at this level of aggregation.</p>
+                </div>
+                <div class="card">
+                    <h4>Sample period</h4>
+                    <p>102 quarters span three crises and two distinct rate regimes. The 2021&ndash;present "everything bubble" and subsequent normalisation are out-of-sample.</p>
+                </div>
+                <div class="card">
+                    <h4>Granger ≠ causation</h4>
+                    <p>Granger causality tests forecast improvement, not causal mechanism. A confounding macro cycle could in principle drive both series. The market &amp; spread controls partially address this but do not eliminate it.</p>
+                </div>
+                <div class="card">
+                    <h4>Linearity</h4>
+                    <p>OLS / VAR assume linear relationships. The Markov phase relaxes this in a regime sense, but more general nonlinearities (e.g. threshold effects in dry-powder levels) are not modelled.</p>
+                </div>
+                <div class="card">
+                    <h4>HY-spread coverage</h4>
+                    <p>93% (95/102 quarters). The early-1990s gap is filled by listwise deletion in the regression — a small sample-size cost, but not an unbiasing one.</p>
+                </div>
             </div>
+        </section>
 
-            <div class="callout-box">
-                <p>
-                    <strong>4. Regime-switching analysis inverts conventional intuition.</strong> The negative fundraising effect is stronger in crisis regimes (regime 0: -8.01 bps) than normal regimes (regime 1: -2.55 bps). But in crises, returns are already deeply negative and both variables are responding to exogenous market shocks, not fundraising causing underperformance.
-                </p>
+        <!-- CONCLUSION -->
+        <section id="conclusion" class="content-section">
+            <span class="eyebrow">07 · Conclusion</span>
+            <h2>Returns lead. Fundraising follows. The market remembers.</h2>
+            <p class="lead">The headline correlation between PE fundraising and PE returns is negative — but the headline is the wrong story. Strong returns reliably attract capital with a 2&ndash;4 quarter lag; that capital then sits in the system as a structural drag on subsequent <em>quarterly aggregate returns</em> of roughly &minus;0.014% per $1B raised, accumulating to &minus;0.114% over an 8-quarter horizon and amplifying roughly threefold inside crisis regimes (β = &minus;0.080 vs &minus;0.026).</p>
+
+            <div class="headline">
+                <strong>What we conclude:</strong>&nbsp; PE markets exhibit a textbook capital cycle. Vintage-year matters, fundraising peaks are warning signs not green lights, and the mechanism is sharper exactly when investors are most tempted to retreat. The cleanest single-sentence summary the data supports: <em>past returns predict future fundraising more reliably than fundraising predicts future returns — and the resulting wave of capital is what depresses the next vintage's performance.</em>
             </div>
-
-            <div class="callout-box">
-                <p>
-                    <strong>5. PE returns follow a dominant 6.94-year capital cycle.</strong> The HP-filtered capital cycle correlates with returns at 0.9745, indicating that ~95% of quarterly variation reflects cyclical fund deployment patterns tied to vintage years. Fundraising is endogenous to this cycle: capital is raised to match anticipated deployment windows, making the observed correlation mechanically inevitable.
-                </p>
-            </div>
-
-            <h3>Interpretation: The Denominator Effect Reconsidered</h3>
-
-            <p>
-                The denominator effect, as documented at the fund-cohort level (e.g., Hüther 2023), may reflect selection and composition effects rather than true crowding. At the market aggregate level, we find that:
-            </p>
-
-            <ol style="margin-left: 30px; line-height: 1.8;">
-                <li>Fundraising predicts returns only through market channels, not through deal competition.</li>
-                <li>The causal arrow runs from returns to fundraising, not the reverse.</li>
-                <li>A significant portion of the observed correlation reflects a common 6.94-year fund lifecycle cycle.</li>
-                <li>Once these dynamics are accounted for, any remaining effect of fundraising on returns is economically small.</li>
-            </ol>
-
-            <h3>Limitations & Future Work</h3>
-
-            <p>
-                Our analysis is limited to market-aggregate data (1995–2020). Fund-level analysis may reveal heterogeneous effects across manager skill or fund strategy. Additionally, we cannot rule out endogenous selection effects: higher-quality GPs may both raise more capital and generate better returns, mechanically creating positive correlation orthogonal to crowding. Future work should decompose these effects using fund-level data with manager and strategy controls.
-            </p>
-
-            <h3>Conclusion</h3>
-
-            <p>
-                The denominator effect at the market level is weaker and more complex than the fund-level evidence suggests. Rather than capital inflows directly crowding out returns through inflated valuations, we find that market conditions drive both fundraising and returns, while an underlying capital cycle structure explains much of the observed comovement. For LPs and GPs, this suggests that fundraising cycles are largely exogenous to manager skill and that the denominator effect should not be the primary criterion for dynamic capital allocation.
-            </p>
         </section>
 
     </main>

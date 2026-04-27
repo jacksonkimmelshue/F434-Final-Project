@@ -156,6 +156,78 @@ document.addEventListener('DOMContentLoaded', function() {
 
     Plotly.newPlot('timeseries-chart', [barTrace, lineTrace], timeSeriesLayout, { responsive: true, displayModeBar: false });
 
+    // ==================== SCATTER PLOT: FUNDRAISING VS RETURNS ====================
+    
+    const scatterX = peFundraising;
+    const scatterY = peReturns;
+
+    // Calculate trend line (simple linear regression)
+    const n = scatterX.length;
+    const sumX = scatterX.reduce((a, b) => a + b, 0);
+    const sumY = scatterY.reduce((a, b) => a + b, 0);
+    const sumXY = scatterX.reduce((sum, x, i) => sum + x * scatterY[i], 0);
+    const sumX2 = scatterX.reduce((sum, x) => sum + x * x, 0);
+    
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+    
+    const trendLineX = [Math.min(...scatterX), Math.max(...scatterX)];
+    const trendLineY = trendLineX.map(x => slope * x + intercept);
+
+    const scatterTrace = {
+        x: scatterX,
+        y: scatterY,
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Observations',
+        marker: {
+            size: 8,
+            color: 'rgba(100, 150, 220, 0.7)',
+            line: { color: 'rgba(100, 150, 220, 1)', width: 1 }
+        },
+        hovertemplate: 'Fundraising: $%{x:.1f}B<br>Returns: %{y:.2f}%<extra></extra>'
+    };
+
+    const trendTrace = {
+        x: trendLineX,
+        y: trendLineY,
+        mode: 'lines',
+        type: 'scatter',
+        name: `Trend (slope=${slope.toFixed(4)})`,
+        line: {
+            color: 'rgba(178, 34, 34, 0.8)',
+            width: 2.5
+        },
+        hoverinfo: 'skip'
+    };
+
+    const scatterLayout = {
+        title: `Fundraising Predicts Returns? (Corr: ${(-0.232).toFixed(3)})`,
+        xaxis: {
+            title: 'PE Fundraising (t) [$Bn]',
+            showgrid: true,
+            gridcolor: '#f0f0f0'
+        },
+        yaxis: {
+            title: 'PE Return (t+1) [%]',
+            showgrid: true,
+            gridcolor: '#f0f0f0',
+            zeroline: true,
+            zerolinewidth: 1,
+            zerolinecolor: 'rgba(200, 200, 200, 0.5)'
+        },
+        width: 850,
+        height: 600,
+        margin: { bottom: 100, left: 100, top: 80, right: 100 },
+        plot_bgcolor: 'rgba(240, 245, 251, 0.5)',
+        paper_bgcolor: '#ffffff',
+        font: { family: "'Cambria', 'Georgia', serif", size: 11 },
+        hovermode: 'closest',
+        legend: { x: 0.02, y: 0.98 }
+    };
+
+    Plotly.newPlot('scatter-chart', [scatterTrace, trendTrace], scatterLayout, { responsive: true, displayModeBar: false });
+
     // ==================== SMOOTH SCROLL & CODE BLOCKS ====================
     
     // Add smooth scroll behavior for navigation
@@ -209,4 +281,308 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     console.log('Page loaded and interactive elements initialized.');
+
+    // ============================================================
+    // IMPORTED CHARTS (Chart.js) — Phases 2–6
+    // OLS coefficients, OLS R², Granger F-stats, VAR IRF + cumulative,
+    // Markov regime probability, regime β, capital cycle vs returns.
+    // ============================================================
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not available — skipping imported chart rendering.');
+        return;
+    }
+
+    // ---- Embedded data (verbatim from F434_Final_Project notebook outputs) ----
+    const QUARTERS = (function () {
+        const out = [];
+        for (let y = 1995; y <= 2020; y++) {
+            for (let q = 1; q <= 4; q++) {
+                if (y === 2020 && q > 2) break;
+                out.push(y + 'Q' + q);
+            }
+        }
+        return out; // 102 quarters
+    })();
+
+    const PE_RETURN = [3.94,4.17,4.4,10.36,6.05,6.56,6.44,7.19,0.96,11.12,7.86,8.53,9.77,4.98,-6.67,7.52,4.2,10.29,3.52,18.17,13.7,-1.34,-0.06,-6.31,-6.14,3.33,-9.09,0.2,-0.4,-2.69,-4.86,0.12,-0.34,7.02,5.25,9.45,2.78,3.46,2.3,15.2,1.31,9.1,7.59,8.06,5.56,4.12,3.78,12.66,5.85,7.6,1.09,3.22,-2.2,0.85,-6.7,-16.08,-3.34,4.52,5.78,6.15,4.45,1.7,5.11,9.15,5.21,4.73,-4.18,5.35,5.51,-0.11,3.71,3.8,4.61,3.19,5.19,7.01,3.13,5.53,0.83,1.46,2.62,3.91,-1.45,0.5,0.0,4.09,4.03,4.66,4.01,3.72,3.96,5.22,2.79,5.3,3.82,-1.97,4.84,3.38,1.25,3.75,-10.09,9.43];
+
+    const CAP_CYCLE = [3.2428,2.7921,2.3722,7.7259,2.8643,2.8837,2.3388,2.7323,-3.7845,6.1581,2.7519,3.3452,4.5742,-0.1667,-11.7161,2.6176,-0.5167,5.7982,-0.7102,14.2322,10.0795,-4.6325,-3.0349,-8.9954,-8.5802,1.0805,-11.2086,-1.853,-2.4515,-4.8016,-7.0893,-2.2778,-2.9455,4.1804,2.1645,6.119,-0.7855,-0.3221,-1.6734,11.0682,-2.9388,4.7775,3.2405,3.7309,1.2971,-0.0347,-0.229,8.8295,2.2264,4.2017,-2.0758,0.2797,-4.9343,-1.7107,-9.1294,-18.429,-5.6625,2.1786,3.3864,3.6815,1.8926,-0.9542,2.3565,6.3001,2.2709,1.7093,-7.276,2.1829,2.2783,-3.3988,0.3712,0.4198,1.1987,-0.2412,1.7508,3.5752,-0.2886,2.1367,-2.5314,-1.8669,-0.672,0.6521,-4.6754,-2.6955,-3.1665,0.9551,0.9347,1.6171,1.0368,0.8368,1.1899,2.588,0.3226,3.0234,1.7599,-3.7903,3.2793,2.0977,0.2618,3.067,-10.4613,0.0];
+
+    const P_CRISIS = [0.0448,0.0247,0.0129,0.0003,0.0033,0.0027,0.0031,0.0053,0.0565,0.0002,0.0006,0.0004,0.0004,0.0898,0.9184,0.0179,0.0051,0.0,0.005,0.0,0.0,0.7617,0.9025,0.9996,0.9997,0.9191,0.9999,0.99,0.994,0.9989,0.9994,0.9555,0.8171,0.0317,0.0066,0.0001,0.0035,0.0032,0.0073,0.0,0.0072,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0002,0.0,0.0002,0.0,0.9821,1.0,0.9201,0.0017,0.0002,0.0,0.0002,0.0044,0.0001,0.0,0.0001,0.0007,0.4611,0.0004,0.0,0.0048,0.0003,0.0,0.0007,0.0003,0.0002,0.0,0.0008,0.0,0.0063,0.0001,0.001,0.0003,0.0429,0.0003,0.001,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0001,0.9933,0.0];
+
+    const RECESSION_BANDS = [
+        { label: 'Dot-com', x0: '2001Q1', x1: '2001Q4', color: 'rgba(31,119,180,0.07)' },
+        { label: 'GFC',     x0: '2007Q4', x1: '2009Q2', color: 'rgba(31,119,180,0.10)' },
+        { label: 'COVID',   x0: '2020Q1', x1: '2020Q2', color: 'rgba(31,119,180,0.07)' }
+    ];
+
+    // ---- Plugin: shaded recession bands by quarter labels ----
+    const shadeBandsPlugin = {
+        id: 'shadeBands',
+        beforeDatasetsDraw(chart, args, opts) {
+            const { ctx, chartArea, scales } = chart;
+            if (!scales.x) return;
+            const bands = (opts && opts.bands) || [];
+            bands.forEach(b => {
+                const x0 = scales.x.getPixelForValue(b.x0);
+                const x1 = scales.x.getPixelForValue(b.x1);
+                if (isFinite(x0) && isFinite(x1)) {
+                    ctx.save();
+                    ctx.fillStyle = b.color;
+                    ctx.fillRect(Math.min(x0, x1), chartArea.top, Math.abs(x1 - x0), chartArea.bottom - chartArea.top);
+                    ctx.restore();
+                }
+            });
+        }
+    };
+    Chart.register(shadeBandsPlugin);
+
+    // ---- Global Chart.js defaults — match existing Cambria/blue palette ----
+    Chart.defaults.font.family = "'Cambria', 'Georgia', 'Times New Roman', serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = '#333';
+    Chart.defaults.borderColor = 'rgba(0,0,0,.12)';
+
+    // Project palette
+    const PAL = {
+        blue:       '#1f77b4',
+        blueSoft:   'rgba(31,119,180,0.18)',
+        blueLight:  '#a8c5e6',
+        rose:       'rgba(178,34,34,0.85)',
+        roseSoft:   'rgba(178,34,34,0.15)',
+        gray:       '#8a8a8a',
+        gridGray:   'rgba(0,0,0,0.08)'
+    };
+
+    // Helper: safely instantiate a chart only if its canvas is present
+    function makeChart(canvasId, config) {
+        const el = document.getElementById(canvasId);
+        if (!el) return null;
+        return new Chart(el, config);
+    }
+
+    // ============== OLS · COEFFICIENTS ==============
+    const olsLabels = ['M1\nUnivariate', 'M2\n+ Controls', 'M3a\nLag 1', 'M3b\nLag 2', 'M4\nAll lags'];
+    const olsCoef   = [-0.0193, -0.0132, -0.0111, -0.0100, -0.0122];
+    const olsR2     = [0.0334, 0.1439, 0.1402, 0.1388, 0.1446];
+
+    makeChart('ch_ols_coef', {
+        type: 'bar',
+        data: {
+            labels: olsLabels,
+            datasets: [{
+                data: olsCoef,
+                backgroundColor: PAL.blue,
+                borderColor: PAL.blue,
+                borderWidth: 1,
+                borderRadius: 0
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => 'β = ' + c.parsed.y.toFixed(4) } }
+            },
+            scales: {
+                y: { title: { display: true, text: 'β on PE_Fundraising' }, ticks: { callback: v => v.toFixed(3) }, grid: { color: PAL.gridGray } },
+                x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+            }
+        }
+    });
+
+    makeChart('ch_ols_r2', {
+        type: 'bar',
+        data: {
+            labels: olsLabels,
+            datasets: [{
+                data: olsR2.map(v => v * 100),
+                backgroundColor: PAL.blueLight,
+                borderColor: PAL.blue,
+                borderWidth: 1,
+                borderRadius: 0
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => 'R² = ' + c.parsed.y.toFixed(2) + '%' } }
+            },
+            scales: {
+                y: { title: { display: true, text: 'R² (%)' }, ticks: { callback: v => v + '%' }, grid: { color: PAL.gridGray } },
+                x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+            }
+        }
+    });
+
+    // ============== GRANGER · F-STATISTICS ==============
+    const gLags    = [1, 2, 3, 4];
+    const gFR      = [3.8844, 1.8667, 1.1794, 0.7752]; // Fund → Ret
+    const gRF      = [0.1686, 7.4621, 4.6599, 4.3692]; // Ret → Fund
+    const gCritical = 3.84;
+
+    function grangerChart(canvasId, vals, fillStyle) {
+        return makeChart(canvasId, {
+            type: 'bar',
+            data: {
+                labels: gLags.map(l => 'Lag ' + l),
+                datasets: [
+                    { data: vals, backgroundColor: fillStyle, borderColor: PAL.blue, borderWidth: 1, borderRadius: 0, label: 'F-stat' },
+                    { type: 'line', data: [gCritical, gCritical, gCritical, gCritical], borderColor: PAL.blue, borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false, label: '5% critical' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { title: { display: true, text: 'F-statistic' }, suggestedMax: Math.max(8.5, Math.max(...vals) + 1), grid: { color: PAL.gridGray } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+    grangerChart('ch_g1', gFR, PAL.blueLight);
+    grangerChart('ch_g2', gRF, PAL.blue);
+
+    // ============== VAR · IMPULSE RESPONSE ==============
+    const irfQ    = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    const irf     = [0, -0.013754, -0.012594, -0.016808, -0.015135, -0.015805, -0.014143, -0.013575, -0.012119];
+    const irfCum  = [0, -0.013754, -0.026347, -0.043155, -0.058290, -0.074095, -0.088238, -0.101813, -0.113932];
+
+    makeChart('ch_irf', {
+        type: 'line',
+        data: {
+            labels: irfQ,
+            datasets: [{
+                data: irf,
+                borderColor: PAL.blue,
+                backgroundColor: PAL.blueSoft,
+                pointBackgroundColor: PAL.blue,
+                borderWidth: 2,
+                pointRadius: 4,
+                tension: 0.2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => c.parsed.y.toFixed(4) + '%' } }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Quarters ahead' }, grid: { color: PAL.gridGray } },
+                y: { title: { display: true, text: 'Return response (%)' }, ticks: { callback: v => v.toFixed(3) + '%' }, grid: { color: PAL.gridGray } }
+            }
+        }
+    });
+
+    makeChart('ch_irf_cum', {
+        type: 'line',
+        data: {
+            labels: irfQ,
+            datasets: [{
+                data: irfCum,
+                borderColor: PAL.blue,
+                backgroundColor: PAL.blueSoft,
+                pointBackgroundColor: PAL.blue,
+                borderDash: [5, 3],
+                borderWidth: 2,
+                pointRadius: 4,
+                tension: 0.2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => c.parsed.y.toFixed(4) + '% cumulative' } }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Quarters ahead' }, grid: { color: PAL.gridGray } },
+                y: { title: { display: true, text: 'Cumulative response (%)' }, ticks: { callback: v => v.toFixed(3) + '%' }, grid: { color: PAL.gridGray } }
+            }
+        }
+    });
+
+    // ============== MARKOV · SMOOTHED P(CRISIS) ==============
+    makeChart('ch_regime_prob', {
+        type: 'line',
+        data: {
+            labels: QUARTERS,
+            datasets: [{
+                data: P_CRISIS,
+                borderColor: PAL.blue,
+                backgroundColor: PAL.blueSoft,
+                borderWidth: 1.5,
+                pointRadius: 0,
+                tension: 0.2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => 'P(Crisis) = ' + c.parsed.y.toFixed(2) } }
+            },
+            scales: {
+                x: { ticks: { maxTicksLimit: 10 }, grid: { display: false } },
+                y: { title: { display: true, text: 'P(Crisis)' }, min: 0, max: 1, grid: { color: PAL.gridGray } }
+            }
+        }
+    });
+
+    // ============== MARKOV · REGIME-SPECIFIC β ==============
+    makeChart('ch_regime_beta', {
+        type: 'bar',
+        data: {
+            labels: ['Crisis regime\n(17 quarters)', 'Normal regime\n(85 quarters)'],
+            datasets: [{
+                data: [-0.0801, -0.0255],
+                backgroundColor: [PAL.rose, PAL.blueLight],
+                borderColor: PAL.blue,
+                borderWidth: 1,
+                borderRadius: 0
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => 'β = ' + c.parsed.y.toFixed(4) } }
+            },
+            scales: {
+                y: { title: { display: true, text: 'β on Fundraising' }, ticks: { callback: v => v.toFixed(3) }, grid: { color: PAL.gridGray } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // ============== CYCLE · PE RETURNS vs HP CYCLE ==============
+    makeChart('ch_cycle', {
+        type: 'line',
+        data: {
+            labels: QUARTERS,
+            datasets: [
+                { label: 'PE return',           data: PE_RETURN, borderColor: PAL.gray, borderWidth: 1, pointRadius: 0, tension: 0.2, fill: false },
+                { label: 'Capital cycle (HP)',  data: CAP_CYCLE, borderColor: PAL.blue, backgroundColor: PAL.blueSoft, borderWidth: 2.2, pointRadius: 0, tension: 0.25, fill: true }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, labels: { color: '#111', usePointStyle: true, pointStyle: 'rectRounded', font: { family: "'Cambria', 'Georgia', serif", size: 12 } } },
+                shadeBands: { bands: RECESSION_BANDS }
+            },
+            scales: {
+                x: { ticks: { maxTicksLimit: 10 }, grid: { display: false } },
+                y: { title: { display: true, text: '%' }, ticks: { callback: v => v.toFixed(1) + '%' }, grid: { color: PAL.gridGray } }
+            }
+        }
+    });
+
+    console.log('Imported Chart.js charts (Phases 2–6) initialized.');
 });

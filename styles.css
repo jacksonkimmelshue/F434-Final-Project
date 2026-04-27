@@ -373,8 +373,22 @@ figcaption {
 }
 
 /* =====================================================
-   RESPONSIVE DESIGN
+   FLOW DIAGRAM
    ===================================================== */
+
+.flow-diagram {
+    margin: 40px 0;
+    padding: 30px;
+    background-color: var(--bg-light);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+}
+
+.flow-diagram svg {
+    max-width: 100%;
+    height: auto;
+}
 
 @media (max-width: 1200px) {
     .sidebar {
@@ -461,4 +475,111 @@ figcaption {
     .code-block code {
         font-size: 10px;
     }
+}
+
+/* =====================================================
+   INTERACTIVE CORRELATION TABLE
+   ===================================================== */
+
+.interactive-table {
+    margin: 25px 0 !important;
+}
+
+.interactive-table .corr-cell {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-black);
+}
+
+/* Color gradient based on correlation value */
+.interactive-table .corr-cell[data-value="1.000"],
+.interactive-table .corr-cell[data-value="0.782"] {
+    background-color: #b3d9ff; /* Light blue for strong positive */
+}
+
+.interactive-table .corr-cell[data-value="0.691"] {
+    background-color: #cce5ff; /* Lighter blue for moderate positive */
+}
+
+.interactive-table .corr-cell[data-value="0.341"] {
+    background-color: #e6f0ff; /* Very light blue for weak positive */
+}
+
+.interactive-table .corr-cell[data-value="-0.155"],
+.interactive-table .corr-cell[data-value="-0.387"] {
+    background-color: #ffe6e6; /* Light red for weak negative */
+}
+
+.interactive-table .corr-cell[data-value="-0.423"],
+.interactive-table .corr-cell[data-value="-0.492"] {
+    background-color: #ffcccc; /* Medium red for moderate negative */
+}
+
+.interactive-table .corr-cell[data-value="-0.526"],
+.interactive-table .corr-cell[data-value="-0.668"],
+.interactive-table .corr-cell[data-value="-0.701"] {
+    background-color: #ffb3b3; /* Darker red for strong negative */
+}
+
+/* Hover effect - darken the background */
+.interactive-table .corr-cell:hover {
+    filter: brightness(0.85);
+    font-weight: 700;
+}
+
+/* Tooltip styling */
+.interactive-table .corr-cell::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-black);
+    color: var(--bg-white);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 100;
+    font-weight: normal;
+}
+
+.interactive-table .corr-cell:hover::after {
+    opacity: 1;
+}
+
+/* =====================================================
+   CORRELATION HEATMAP CENTERING
+   ===================================================== */
+
+#correlation-heatmap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px auto !important;
+}
+
+#correlation-heatmap > div {
+    margin: 0 auto !important;
+}
+
+/* =====================================================
+   TIME SERIES CHART CENTERING
+   ===================================================== */
+
+#timeseries-chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 60px auto !important;
+}
+
+#timeseries-chart > div {
+    margin: 0 auto !important;
 }

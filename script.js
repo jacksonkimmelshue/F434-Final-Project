@@ -25,29 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Dark mode toggle
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
-    const darkModeIcon = document.querySelector('.dark-mode-icon');
-    
-    // Check if dark mode was previously enabled
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (isDarkMode) {
-        document.body.classList.add('dark-mode');
-        darkModeIcon.textContent = '☀️';
-    } else {
-        darkModeIcon.textContent = '🌙';
-    }
-
-    // Toggle dark mode on button click
-    darkModeToggle.addEventListener('click', function() {
-        document.body.classList.toggle('dark-mode');
-        const isNowDark = document.body.classList.contains('dark-mode');
-        localStorage.setItem('darkMode', isNowDark);
-        
-        // Update icon
-        darkModeIcon.textContent = isNowDark ? '☀️' : '🌙';
-    });
-
     // Add "Copy Code" button to code blocks
     document.querySelectorAll('.code-block pre').forEach(pre => {
         const button = document.createElement('button');
@@ -112,5 +89,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Highlight rows on hover (tables)
+    document.querySelectorAll('table tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#e0e0e0';
+        });
+        row.addEventListener('mouseleave', function() {
+            if (this.rowIndex % 2 === 0) {
+                this.style.backgroundColor = '';
+            } else {
+                this.style.backgroundColor = 'var(--bg-light)';
+            }
+        });
+    });
+
     console.log('Page loaded and interactive elements initialized.');
 });
+
+/* =====================================================
+   UTILITY: Scroll to top button
+   ===================================================== */
+
+window.addEventListener('scroll', function() {
+    const scrollTopBtn = document.getElementById('scroll-to-top');
+    if (scrollTopBtn) {
+        if (window.pageYOffset > 300) {
+            scrollTopBtn.style.display = 'block';
+        } else {
+            scrollTopBtn.style.display = 'none';
+        }
+    }
+});
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}

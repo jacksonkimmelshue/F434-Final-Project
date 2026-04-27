@@ -25,6 +25,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const darkModeIcon = document.querySelector('.dark-mode-icon');
+    
+    // Check if dark mode was previously enabled
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkModeIcon.textContent = '☀️';
+    } else {
+        darkModeIcon.textContent = '🌙';
+    }
+
+    // Toggle dark mode on button click
+    darkModeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        const isNowDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isNowDark);
+        
+        // Update icon
+        darkModeIcon.textContent = isNowDark ? '☀️' : '🌙';
+    });
+
     // Add "Copy Code" button to code blocks
     document.querySelectorAll('.code-block pre').forEach(pre => {
         const button = document.createElement('button');

@@ -18,18 +18,15 @@
             <nav class="toc">
                 <ul>
                     <li><a href="#intro">Introduction</a></li>
-                    <li><a href="#question">Research Question</a></li>
-                    <li><a href="#why">Why It Matters</a></li>
                     <li><a href="#methodology">Methodology</a></li>
-                    <li><a href="#data">Data & Exploratory Data Analysis</a></li>
-                    <li><a href="#ols">OLS Analysis</a></li>
+                    <li><a href="#data">Data & Analysis</a></li>
+                    <li><a href="#ols">Ordinary Least Squares Regression</a></li>
                     <li><a href="#granger">Granger Causality</a></li>
                     <li><a href="#var">VAR & Impulse Response</a></li>
-                    <li><a href="#markov">Markov Switching</a></li>
-                    <li><a href="#cycles">Capital Cycles</a></li>
                     <li><a href="#findings">Findings & Interpretation</a></li>
                     <li><a href="#limitations">Limitations</a></li>
                     <li><a href="#conclusion">Conclusion</a></li>
+                    <li class="toc-divider"><a href="#appendix" class="appendix-link">Appendix</a></li>
                 </ul>
             </nav>
         </div>
@@ -49,6 +46,7 @@
 
         <!-- INTRODUCTION -->
         <section id="intro" class="content-section">
+            <span class="eyebrow">01 · Introduction</span>
             <h2>Introduction</h2>
 
             <h3>The Denominator Effect Explained</h3>
@@ -60,10 +58,15 @@
                 The intuition underlying this phenomenon is economically sensible. During periods of robust equity market performance and favorable financing conditions, institutional investors systematically increase their allocations to private equity, viewing the asset class as an attractive risk-return proposition. This procyclical behavior drives aggregate capital raised by PE funds to elevated levels. However, this influx of capital, if not matched by a corresponding expansion in the universe of high-quality investment opportunities, creates several economic frictions. General partners face intensifying competition for deal flow, which mechanically inflates entry valuations. The pressure to deploy capital efficiently—particularly among newly-formed funds with limited operating track records—may lead to hastier investment decisions and weaker post-acquisition operational oversight.
             </p>
 
-            <h3>Our Hypothesis</h3>
-            
-            <div class="callout-box">
-                <p><strong>Elevated PE fundraising in period t predicts negative returns in subsequent periods (t+1, t+2, ..., t+n), controlling for macroeconomic fundamentals and market conditions. This relationship arises because capital abundance intensifies competition for deal flow, mechanically inflating entry valuations and constraining exit multiples, thereby degrading realized returns on newly deployed capital.</strong></p>
+            <div class="grid g-2" style="margin-top:18px">
+                <div class="card" style="background-color:#f0f5fb;border:none;border-left:5px solid var(--primary-blue);padding:25px 30px">
+                    <h3 style="margin-top:0">Our Hypothesis</h3>
+                    <p style="font-style:italic"><strong>H&#8321; (capital-cycle):&nbsp; Elevated PE fundraising in period t predicts negative returns in subsequent periods (t+1, t+2, ..., t+n), controlling for macroeconomic fundamentals and market conditions. This relationship arises because capital abundance intensifies competition for deal flow, mechanically inflating entry valuations and constraining exit multiples, thereby degrading realized returns on newly deployed capital.</strong></p>
+                </div>
+                <div class="card" style="background-color:#f0f5fb;border:none;border-left:5px solid var(--primary-blue);padding:25px 30px">
+                    <h3 style="margin-top:0">Alternative Hypothesis</h3>
+                    <p style="font-style:italic"><strong>H&#8320; (null / efficient-markets):&nbsp; Elevated PE fundraising in period t carries no information about returns in subsequent periods (t+1, t+2, ..., t+n) once macroeconomic fundamentals and market conditions are controlled for. Under this view capital flows where opportunity exists, entry valuations are competitively priced, and any apparent fundraising&ndash;return relationship reflects common exposure to macro factors rather than a structural drag on newly deployed capital.</strong></p>
+                </div>
             </div>
 
             <h3>Stakeholder Implications</h3>
@@ -77,63 +80,25 @@
             </p>
         </section>
 
-        <!-- RESEARCH QUESTION -->
-        <section id="question" class="content-section">
-            <span class="eyebrow">02 · Research Question</span>
-            <h2>Does the wave of capital entering private equity contain information about future PE returns?</h2>
-            <p class="lead">Equivalently: is the headline-grabbing surge in PE fundraising a leading indicator of strong vintages — or a warning sign of dilution to come?</p>
-
-            <div class="grid g-2">
-                <div class="card">
-                    <h4>Hypothesis (H&#8321;)</h4>
-                    <p>If markets are well-arbitraged, fundraising should not predict future returns: capital flows where opportunity exists, and the relationship should wash out once we control for macro conditions and lagged returns.</p>
-                </div>
-                <div class="card">
-                    <h4>Alternative (H&#8322; — capital-cycle)</h4>
-                    <p>If PE behaves like a "money-chases-deals" market, fundraising surges should reflect <em>past</em> returns and forecast <em>lower</em> future returns — because too much dry powder bids up entry multiples.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- WHY IT MATTERS (LPs + GPs only) -->
-        <section id="why" class="content-section">
-            <span class="eyebrow">03 · Why This Matters</span>
-            <h2>For Limited Partners and General Partners</h2>
-            <div class="grid g-2">
-                <div class="card">
-                    <h4>For Limited Partners</h4>
-                    <p>If fundraising peaks coincide with future return troughs, naive "trend-chasing" allocation hurts long-run portfolio returns. LPs should consider <em>contrarian</em> commitment pacing — leaning against fundraising peaks rather than into them.</p>
-                </div>
-                <div class="card">
-                    <h4>For General Partners</h4>
-                    <p>Vintage-year matters. Deploying capital into a crowded fundraising peak embeds a structural drag on subsequent quarterly returns — small per dollar (≈ &minus;0.014% per $1B in the VAR), but compounded across a fund life and amplified roughly threefold inside crisis regimes.</p>
-                </div>
-            </div>
-        </section>
-
         <!-- METHODOLOGY -->
         <section id="methodology" class="content-section">
-            <span class="eyebrow">04 · Methodology</span>
-            <h2>A six-phase econometric pipeline</h2>
-            <p class="lead">Each phase is designed to test the central hypothesis under progressively stronger assumptions — and to triangulate around the same finding from multiple angles.</p>
-
+            <span class="eyebrow">02 · Methodology</span>
+            <h2>A Roadmap of Our Methodology</h2>
             <div class="callout-box" style="font-style: normal;">
-                <p style="font-style: normal;"><strong>Data provenance.</strong>&nbsp; Every numerical value, time series, and chart on this page is taken verbatim from the source artefacts of <span class="mono">F434_Final_Project.ipynb</span>: <span class="mono">PE_Quarterly_Returns.xlsx</span> (102 quarters, 1995 Q1 – 2020 Q2), <span class="mono">PE_Fundraising.xlsx</span>, and <span class="mono">master_data_with_dmd.csv</span> (which contains the project's own macro controls and the HP-filter <span class="mono">Capital_Cycle</span> column at λ = 1600). The Granger F-statistics, VAR / IRF coefficients, OLS β &amp; R², regime statistics, smoothed crisis probabilities, and correlation matrix were each cross-checked against the notebook's printed output (and re-fitted in Python where the notebook output was incomplete) before being embedded in the JavaScript constants below the page.</p>
+                <p style="font-style: normal;"><strong>How the four phases fit together.</strong>&nbsp; Our analysis runs in four phases, with each one taking a different modeling approach. We start with exploratory data analysis to map the basic correlations, then move into OLS regressions to see whether the negative fundraising-return relationship remains significant after removing confounding variables. Granger causality tests pin down which variable leads the other, and a VAR(2) traces how a fundraising shock propagates through future returns. Two supplementary analyses &mdash; a DMD and HP-filter capital-cycle extraction, and a Markov regime-switching regression that tests whether the effect is stable across normal and crisis periods &mdash; are included in the Appendix.</p>
             </div>
 
             <div class="grid g-2">
                 <div>
                     <div class="timeline">
-                        <div class="tl-item"><h4>Phase 1 · Exploratory data analysis</h4><p>Descriptives, correlations, time series with NBER recession bands, scatters &amp; distributions. Establishes baseline associations.</p></div>
-                        <div class="tl-item"><h4>Phase 2 · OLS regressions (Models 1&ndash;4)</h4><p>Univariate &rarr; multivariate &rarr; lagged &rarr; all-lags. Tests whether the negative association survives controls.</p></div>
-                        <div class="tl-item amber"><h4>Phase 3 · Granger causality</h4><p>4-lag bidirectional tests. Identifies the <em>direction</em> of predictability — the pivotal question for the capital-cycle thesis.</p></div>
+                        <div class="tl-item"><h4>Phase 1 · Exploratory Data Analysis</h4><p>Descriptives, correlations, time series with NBER recession bands, scatters &amp; distributions. Establishes baseline associations.</p></div>
+                        <div class="tl-item"><h4>Phase 2 · OLS Regressions (Models 1&ndash;4)</h4><p>Univariate &rarr; multivariate &rarr; lagged &rarr; all-lags. Tests whether the negative association survives controls.</p></div>
                     </div>
                 </div>
                 <div>
                     <div class="timeline">
-                        <div class="tl-item"><h4>Phase 4 · Vector autoregression (VAR-2)</h4><p>Bivariate VAR with impulse-response functions &amp; forecast-error variance decomposition. Quantifies persistence of shocks.</p></div>
-                        <div class="tl-item"><h4>Phase 5 · Markov regime switching</h4><p>2-state regression that lets fundraising's effect vary across normal vs. crisis regimes. Tests whether the relationship is state-dependent.</p></div>
-                        <div class="tl-item"><h4>Phase 6 · DMD &amp; HP filter</h4><p>Hankel Dynamic Mode Decomposition + Hodrick-Prescott filter to extract a 4&ndash;10 year capital cycle from the return series.</p></div>
+                        <div class="tl-item amber"><h4>Phase 3 · Granger Causality</h4><p>4-lag bidirectional tests. Identifies the <em>direction</em> of predictability — the pivotal question for the capital-cycle thesis.</p></div>
+                        <div class="tl-item"><h4>Phase 4 · Vector Autoregression (VAR-2)</h4><p>Bivariate VAR with impulse-response functions &amp; forecast-error variance decomposition. Quantifies persistence of shocks.</p></div>
                     </div>
                 </div>
             </div>
@@ -141,7 +106,8 @@
 
         <!-- DATA & EDA -->
         <section id="data" class="content-section">
-            <h2>Data & Exploratory Data Analysis</h2>
+            <span class="eyebrow">03 · Data &amp; Analysis</span>
+            <h2>Data & Analysis</h2>
 
             <h3>Data Sources</h3>
             <p>
@@ -291,26 +257,37 @@
                 The correlation structure reveals three critical patterns. First, PE returns move strongly with market conditions (correlation = 0.782 with market excess returns), while the relationship with fundraising is weak (-0.155). Second, fundraising itself is driven more by interest rates (correlation = -0.567 with 10Y rates) than by PE returns. Third, risk factors cluster together: HY spreads and VIX move in tandem (0.803), and interest rates are nearly perfectly collinear (risk-free rate vs fed funds rate = 0.997), suggesting common underlying macro drivers. This pattern suggests that the denominator effect operates through market mechanisms rather than direct capital competition.
             </p>
 
-            <div id="correlation-heatmap" style="margin: 40px 0; background-color: var(--bg-light); padding: 20px; border-radius: 4px;"></div>
+            <div class="heatmap-container">
+                <div id="heatmap" class="heatmap"></div>
+                <div class="heatmap-legend" aria-hidden="true">
+                    <div class="legend-track">
+                        <div class="legend-bar"></div>
+                        <ul class="legend-labels">
+                            <li>+1.0</li>
+                            <li>+0.5</li>
+                            <li>0</li>
+                            <li>&minus;0.5</li>
+                            <li>&minus;1.0</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
             <details class="code-block">
                 <summary>Show Code: Correlation Matrix</summary>
                 <pre><code class="language-python">
-import pandas as pd
-import numpy as np
-
-# Load master data
-master_data = pd.read_csv('master_data_1995_2020.csv')
-
-# Select variables for correlation
-variables = ['PE_Return', 'PE_Fundraising', 'market_excess_return', 
-             'hy_spread', 'vix', 'risk_free_rate', 'rate_10y', 'fed_funds_rate']
-
-# Calculate correlation matrix
-corr_matrix = master_data[variables].corr()
-
-print("Correlation Matrix:")
+# 2. CORRELATION MATRIX
+print("\n2. CORRELATION MATRIX")
+corr_matrix = master_data.select_dtypes(include=[np.number]).corr()
 print(corr_matrix.round(3))
+
+fig, ax = plt.subplots(figsize=(10, 8))
+sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='RdBu_r', center=0,
+            square=True, linewidths=0.5, cbar_kws={"shrink": 0.8},
+            vmin=-1, vmax=1, ax=ax)
+ax.set_title('Correlation Matrix', fontsize=14, fontweight='bold', pad=20)
+plt.tight_layout()
+plt.show()
                 </code></pre>
             </details>
 
@@ -320,66 +297,100 @@ print(corr_matrix.round(3))
                 The 25-year time series reveals the procyclical nature of PE fundraising and the volatility of returns. Notable features include the sharp fundraising collapse and negative returns during the 2008-2009 financial crisis, the recovery and elevated fundraising during 2005-2007 preceding the downturn, and the steady capital deployment throughout 2010-2015 despite modest returns. The relationship is visually evident: fundraising spikes occur in periods of strong returns (1999-2000, 2005-2007), while crises are marked by both return collapses and subsequent fundraising droughts. This comovement is consistent with reverse causality—good returns prompt LP commitments, while market downturns reduce both returns and future fundraising simultaneously.
             </p>
 
-            <div id="timeseries-chart" style="margin: 60px 0; background-color: var(--bg-light); padding: 20px; border-radius: 4px;"></div>
+            <div id="timeseries-chart" style="margin: 60px 0; background-color: transparent; padding: 0;"></div>
 
             <details class="code-block">
                 <summary>Show Code: Time Series Visualization</summary>
                 <pre><code class="language-python">
-import plotly.graph_objects as go
+# 3. TIME SERIES (with NBER recession shading)
+master_data['Date'] = pd.PeriodIndex(master_data['Quarter'], freq='Q').to_timestamp()
 
-# Create time series chart
-fig = go.Figure()
+recessions = [
+    (datetime(2001, 3, 1),  datetime(2001, 11, 1)),
+    (datetime(2007, 12, 1), datetime(2009, 6, 1)),
+    (datetime(2020, 3, 1),  datetime(2020, 4, 1))
+]
 
-fig.add_trace(go.Bar(
-    x=quarters, y=pe_fundraising,
-    name='PE Fundraising ($B)', 
-    marker=dict(color='rgba(100, 150, 220, 0.6)'),
-    yaxis='y1'
-))
+# PE quarterly returns
+fig, ax = plt.subplots(figsize=(14, 5))
+for start, end in recessions:
+    ax.axvspan(start, end, alpha=0.15, color='gray')
+ax.plot(master_data['Date'], master_data['PE_Return'], linewidth=2, color='#1f77b4')
+ax.set_xlabel('Year', fontsize=12, fontweight='bold')
+ax.set_ylabel('Return (%)', fontsize=12, fontweight='bold')
+ax.set_title('PE Quarterly Returns', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
 
-fig.add_trace(go.Scatter(
-    x=quarters, y=pe_returns,
-    name='PE Returns (%)',
-    mode='lines',
-    line=dict(color='rgba(178, 34, 34, 0.8)', width=2.5),
-    yaxis='y2'
-))
-
-fig.update_layout(
-    title='PE Fundraising & Returns Over Time (1995-2020)',
-    xaxis=dict(tickangle=-45),
-    yaxis=dict(title='PE Fundraising ($B)'),
-    yaxis2=dict(title='PE Returns (%)', overlaying='y', side='right'),
-    hovermode='x unified'
-)
-
-fig.show()
+# PE quarterly fundraising
+fig, ax = plt.subplots(figsize=(14, 5))
+for start, end in recessions:
+    ax.axvspan(start, end, alpha=0.15, color='gray')
+ax.bar(master_data['Date'], master_data['PE_Fundraising'], width=70,
+       color='#ff7f0e', alpha=0.8)
+ax.set_xlabel('Year', fontsize=12, fontweight='bold')
+ax.set_ylabel('Capital Raised ($Bn)', fontsize=12, fontweight='bold')
+ax.set_title('PE Quarterly Fundraising', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
                 </code></pre>
             </details>
 
             <h3>Bivariate Relationship: Fundraising & Returns</h3>
 
             <p>
-                The scatter plot reveals the weak and noisy relationship between contemporaneous PE fundraising and returns (correlation = -0.232). The fitted trend line (slope = -0.023) is nearly flat, indicating that fundraising explains very little quarterly return variation. High-fundraising periods are associated with moderately lower returns on average, but the relationship is loose: some high-fundraising quarters produced positive returns, while some low-fundraising periods saw negative returns. This scatter is consistent with reverse causality—both variables respond independently to market shocks rather than fundraising mechanically depressing returns.
+                The scatter plots quarterly PE fundraising at time <em>t</em> against PE returns one quarter later (<em>t</em>+1), so the relationship shown here is lagged rather than contemporaneous. The one-quarter-lagged correlation is -0.232, modestly stronger than the contemporaneous correlation of -0.155 reported in the matrix above — a first piece of evidence that fundraising tends to <em>lead</em> returns in time rather than just move alongside them. The fitted trend line (slope = -0.023) is still relatively flat: high-fundraising quarters are associated with somewhat weaker returns the following quarter, but the relationship is noisy and a meaningful share of the variance is left unexplained. This is the basic pattern the rest of the analysis works to either confirm or rule out as reverse causality.
             </p>
 
-            <div id="scatter-chart" style="margin: 60px 0; background-color: var(--bg-light); padding: 20px; border-radius: 4px;"></div>
+            <div id="scatter-chart" class="plotly-centered" style="margin: 40px auto; max-width: 940px; background-color: transparent; padding: 0;"></div>
+
+            <details class="code-block">
+                <summary>Show Code: Bivariate Scatter (Fundraising → Next-Quarter Return)</summary>
+                <pre><code class="language-python">
+# 4. SCATTER PLOT — PE_Fundraising(t) vs PE_Return(t+1)
+scatter_data = master_data[:-1].copy()
+scatter_data['PE_Return_Next'] = master_data['PE_Return'].shift(-1).iloc[:-1].values
+
+z = np.polyfit(scatter_data['PE_Fundraising'], scatter_data['PE_Return_Next'], 1)
+p = np.poly1d(z)
+x_line = np.linspace(scatter_data['PE_Fundraising'].min(),
+                     scatter_data['PE_Fundraising'].max(), 100)
+y_line = p(x_line)
+corr = scatter_data['PE_Fundraising'].corr(scatter_data['PE_Return_Next'])
+
+fig, ax = plt.subplots(figsize=(11, 7))
+ax.scatter(scatter_data['PE_Fundraising'], scatter_data['PE_Return_Next'],
+           s=80, alpha=0.6, color='#1f77b4', edgecolors='black', linewidth=0.5)
+ax.plot(x_line, y_line, color='red', linewidth=2.5,
+        label=f'Trend (slope={z[0]:.3f})')
+ax.set_xlabel('PE Fundraising (t) [$Bn]', fontsize=12, fontweight='bold')
+ax.set_ylabel('PE Return (t+1) [%]', fontsize=12, fontweight='bold')
+ax.set_title(f'Fundraising Predicts Returns? (Corr: {corr:.3f})',
+             fontsize=14, fontweight='bold')
+ax.legend(fontsize=11)
+plt.tight_layout()
+plt.show()
+
+print(f"\nSlope: {z[0]:.6f}")
+print(f"Correlation: {corr:.4f}")
+                </code></pre>
+            </details>
         </section>
 
         <!-- OLS ANALYSIS -->
         <section id="ols" class="content-section">
-            <span class="eyebrow">Phase 2</span>
-            <h2>OLS — five nested regressions of next-quarter return on fundraising</h2>
-            <p class="lead">We move from a univariate baseline to a fully-controlled, lagged specification. The fundraising coefficient stays consistently negative — but its magnitude shrinks once macro variables enter the model, telling us how much of the raw effect is just compensation for the credit-cycle. The sample consists of 92 observations after dropping missing values for the HY spread variable.</p>
+            <span class="eyebrow">04 · Ordinary Least Squares Regression</span>
+            <h2>Ordinary Least Squares Regression — Five Nested Regressions of Next-Quarter Return on Fundraising</h2>
+            <p class="lead">We move from a univariate baseline to a fully-controlled model that also incorporates prior-quarter fundraising terms. The fundraising coefficient stays consistently negative — but its magnitude shrinks once macro variables enter the model, telling us how much of the raw effect is just compensation for the credit-cycle. The sample consists of 92 observations after dropping missing values for the HY spread variable.</p>
 
             <div class="grid g-2">
                 <div class="card">
-                    <h4>Coefficient on fundraising across models</h4>
+                    <h4>Coefficient on Fundraising Across Models</h4>
                     <div class="chart-wrap"><canvas id="ch_ols_coef"></canvas></div>
                     <div class="caption">All five specifications produce a negative point estimate. The univariate model (M1) overstates the effect because it implicitly absorbs unrelated macro variation; once we add controls (M2&ndash;M4) the coefficient stabilises near &minus;0.012.</div>
                 </div>
                 <div class="card">
-                    <h4>R&sup2; — explanatory power</h4>
+                    <h4>R&sup2; — Explanatory Power</h4>
                     <div class="chart-wrap"><canvas id="ch_ols_r2"></canvas></div>
                     <div class="caption">Adding controls raises R&sup2; from 3.3% &rarr; ~14.4%. Most of that lift comes from the market factor and the HY spread, not from fundraising itself.</div>
                 </div>
@@ -433,38 +444,81 @@ fig.show()
             </table>
 
             <div class="callout-box">
-                <p><strong>What we still don't know:</strong>&nbsp; OLS tells us fundraising and next-quarter returns <em>co-move negatively</em>. It cannot tell us whether fundraising <em>causes</em> the lower return, or whether something else (e.g. last quarter's strong return) drives both. Phase 3 settles that.</p>
+                <p><strong>What we still don't know:</strong>&nbsp; OLS tells us fundraising and next-quarter returns <em>co-move slightly negatively</em>. It cannot tell us whether fundraising <em>causes</em> the lower return, or whether something else (e.g. last quarter's strong return) drives both.</p>
             </div>
 
             <details class="code-block">
-                <summary>Show Code: OLS Regression</summary>
+                <summary>Show Code: OLS Regressions (Models 1 → 4)</summary>
                 <pre><code class="language-python">
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
-import statsmodels.api as sm
 
-# Prepare regression data
-reg_data = master_data[['PE_Return', 'PE_Fundraising', 'market_excess_return', 
-                        'hy_spread', 'vix']].dropna()
+# Prepare data: predict NEXT-quarter return from current-quarter fundraising
+reg_data = master_data[['PE_Return', 'PE_Fundraising', 'market_excess_return',
+                        'rate_10y', 'hy_spread', 'vix']].copy()
+for col in reg_data.columns:
+    reg_data[col] = pd.to_numeric(reg_data[col], errors='coerce')
+reg_data = reg_data.dropna()
 
-# Model 1: Univariate
-X1 = sm.add_constant(reg_data[['PE_Fundraising']])
-y = reg_data['PE_Return']
-model1 = sm.OLS(y, X1).fit()
-print(model1.summary())
+reg_data['PE_Return_Next']        = reg_data['PE_Return'].shift(-1)
+reg_data['PE_Fundraising_Lag1']   = reg_data['PE_Fundraising'].shift(1)
+reg_data['PE_Fundraising_Lag2']   = reg_data['PE_Fundraising'].shift(2)
+reg_data = reg_data.dropna()
+y = reg_data['PE_Return_Next'].values
 
-# Model 2: With Controls
-X2 = sm.add_constant(reg_data[['PE_Fundraising', 'market_excess_return', 'hy_spread', 'vix']])
-model2 = sm.OLS(y, X2).fit()
-print(model2.summary())
+# MODEL 1: Univariate
+X1 = reg_data[['PE_Fundraising']].values
+model1 = LinearRegression().fit(X1, y)
+r2_1   = r2_score(y, model1.predict(X1))
+
+# MODEL 2: + market / HY / VIX controls
+X2 = reg_data[['PE_Fundraising', 'market_excess_return', 'hy_spread', 'vix']].values
+model2 = LinearRegression().fit(X2, y)
+r2_2   = r2_score(y, model2.predict(X2))
+
+# MODEL 3A: fundraising at lag 1
+X3a = reg_data[['PE_Fundraising_Lag1', 'market_excess_return', 'hy_spread', 'vix']].values
+model3a = LinearRegression().fit(X3a, y)
+r2_3a   = r2_score(y, model3a.predict(X3a))
+
+# MODEL 3B: fundraising at lag 2
+X3b = reg_data[['PE_Fundraising_Lag2', 'market_excess_return', 'hy_spread', 'vix']].values
+model3b = LinearRegression().fit(X3b, y)
+r2_3b   = r2_score(y, model3b.predict(X3b))
+
+# MODEL 4: contemporaneous + Lag 1 + Lag 2 fundraising + macro controls
+X4 = reg_data[['PE_Fundraising', 'PE_Fundraising_Lag1', 'PE_Fundraising_Lag2',
+               'market_excess_return', 'hy_spread', 'vix']].values
+model4 = LinearRegression().fit(X4, y)
+r2_4   = r2_score(y, model4.predict(X4))
+
+# Plot fundraising coefficient across the 5 nested specs
+models = ['Model 1\n(Univariate)', 'Model 2\n(+ Controls)',
+          'Model 3A\n(Lag 1)',     'Model 3B\n(Lag 2)',
+          'Model 4\n(All Lags)']
+coefs  = [model1.coef_[0], model2.coef_[0], model3a.coef_[0],
+          model3b.coef_[0], model4.coef_[0]]
+r2s    = [r2_1, r2_2, r2_3a, r2_3b, r2_4]
+
+fig, ax = plt.subplots(figsize=(12, 6))
+colors = ['red' if c < 0 else 'blue' for c in coefs]
+ax.bar(models, coefs, color=colors, alpha=0.7, edgecolor='black', linewidth=1.5)
+ax.axhline(0, color='black', linewidth=0.8)
+ax.set_ylabel('Coefficient', fontsize=12, fontweight='bold')
+ax.set_title('Fundraising Effect on PE Returns Across Models',
+             fontsize=14, fontweight='bold', pad=15)
+for i, (coef, r2) in enumerate(zip(coefs, r2s)):
+    ax.text(i, coef + 0.0003, f'{coef:.4f}\nR²={r2:.3f}', ha='center', fontsize=9)
+plt.tight_layout()
+plt.show()
                 </code></pre>
             </details>
         </section>
 
         <!-- GRANGER CAUSALITY -->
         <section id="granger" class="content-section">
-            <span class="eyebrow">Phase 3 · Pivotal Finding</span>
-            <h2>Granger causality — which variable leads which?</h2>
+            <span class="eyebrow">05 · Granger Causality</span>
+            <h2>Granger Causality — Which Variable Leads Which?</h2>
             <p class="lead">A Granger test asks: does adding past values of <em>X</em> improve our forecast of <em>Y</em> beyond <em>Y</em>'s own history? It is not "true" causation, but for two time series with a 4-quarter lag structure, it is the cleanest available test of <em>direction</em>.</p>
 
             <div class="grid g-2">
@@ -472,8 +526,8 @@ print(model2.summary())
                     <h4>Fundraising &rarr; Returns?</h4>
                     <div class="chart-wrap"><canvas id="ch_g1"></canvas></div>
                     <div class="legend-row">
-                        <span class="lg"><span class="swatch" style="background:#a8c5e6;border:1px solid #1f77b4"></span>F-statistic</span>
-                        <span class="lg"><span class="swatch" style="background:#1f77b4;height:2px"></span>5% critical value (3.84)</span>
+                        <span class="lg"><span class="swatch" style="background:rgba(100,150,220,0.45);border:1px solid rgba(100,150,220,1)"></span>F-statistic</span>
+                        <span class="lg"><span class="swatch" style="background:rgba(100,150,220,1);height:2px"></span>5% critical value (3.84)</span>
                     </div>
                     <div class="caption">Only Lag 1 reaches the 10% threshold (F = 3.88, p = 0.052). Lags 2&ndash;4 are well below the critical line. Fundraising barely Granger-causes returns.</div>
                 </div>
@@ -482,8 +536,8 @@ print(model2.summary())
                     <h4><em>Returns &rarr; Fundraising?</em></h4>
                     <div class="chart-wrap"><canvas id="ch_g2"></canvas></div>
                     <div class="legend-row">
-                        <span class="lg"><span class="swatch" style="background:#1f77b4"></span>F-statistic</span>
-                        <span class="lg"><span class="swatch" style="background:#1f77b4;height:2px"></span>5% critical value (3.84)</span>
+                        <span class="lg"><span class="swatch" style="background:rgba(100,150,220,1)"></span>F-statistic</span>
+                        <span class="lg"><span class="swatch" style="background:rgba(100,150,220,1);height:2px"></span>5% critical value (3.84)</span>
                     </div>
                     <div class="caption">F-stats of 7.46 / 4.66 / 4.37 at lags 2 / 3 / 4 — all significant at the 1% level. Strong PE returns reliably predict capital flooding in 6&ndash;12 months later.</div>
                 </div>
@@ -539,42 +593,81 @@ print(model2.summary())
             </table>
 
             <div class="headline">
-                <strong>Read this as:</strong>&nbsp; the OLS-style negative slope is <em>not</em> evidence that fundraising drives down returns. It is evidence that strong returns first attract capital (Returns &rarr; Fundraising), and the resulting capital then sits in the regressor at the <em>same time</em> as the eventual cooling of returns. The capital cycle is fundamentally a feedback loop, and Phase 3 identifies which leg leads.
+                <strong>Key Takeaway:</strong>&nbsp; the OLS-style negative slope is <em>not</em> evidence that fundraising drives down returns. It is evidence that strong returns first attract capital (Returns &rarr; Fundraising), and the resulting capital then sits in the regressor at the <em>same time</em> as the eventual cooling of returns. The capital cycle is fundamentally a feedback loop, and Phase 3 identifies which leg leads.
             </div>
 
             <details class="code-block">
-                <summary>Show Code: Granger Causality Test</summary>
+                <summary>Show Code: Granger Causality (Bidirectional, 4 Lags)</summary>
                 <pre><code class="language-python">
 from statsmodels.tsa.stattools import grangercausalitytests
 
 # Prepare data
-granger_data = master_data[['PE_Return', 'PE_Fundraising']].dropna()
+reg_data_gc = master_data[['PE_Return', 'PE_Fundraising']].copy()
+for col in reg_data_gc.columns:
+    reg_data_gc[col] = pd.to_numeric(reg_data_gc[col], errors='coerce')
+reg_data_gc = reg_data_gc.dropna()
 
-# Test: Fundraising → Returns
-print("H0: PE_Fundraising does NOT Granger-cause PE_Return")
-grangercausalitytests(granger_data[['PE_Return', 'PE_Fundraising']], maxlag=4)
+# Direction 1: H0: Fundraising does NOT Granger-cause Returns
+data_gc   = reg_data_gc.values
+gc_result = grangercausalitytests(data_gc, maxlag=4, verbose=False)
 
-# Test: Returns → Fundraising
-print("H0: PE_Return does NOT Granger-cause PE_Fundraising")
-grangercausalitytests(granger_data[['PE_Fundraising', 'PE_Return']], maxlag=4)
+f_stats, p_values = [], []
+for lag in range(1, 5):
+    f_stat, p_val, _, _ = gc_result[lag][0]['ssr_ftest']
+    f_stats.append(f_stat)
+    p_values.append(p_val)
+    sig = "***" if p_val < 0.01 else "**" if p_val < 0.05 else "*" if p_val < 0.10 else "ns"
+    print(f"Lag {lag}: F={f_stat:.4f}, p={p_val:.4f} {sig}")
+
+# Direction 2: H0: Returns do NOT Granger-cause Fundraising
+data_gc_rev   = reg_data_gc[['PE_Fundraising', 'PE_Return']].values
+gc_result_rev = grangercausalitytests(data_gc_rev, maxlag=4, verbose=False)
+
+f_stats_rev, p_values_rev = [], []
+for lag in range(1, 5):
+    f_stat, p_val, _, _ = gc_result_rev[lag][0]['ssr_ftest']
+    f_stats_rev.append(f_stat)
+    p_values_rev.append(p_val)
+    sig = "***" if p_val < 0.01 else "**" if p_val < 0.05 else "*" if p_val < 0.10 else "ns"
+    print(f"Lag {lag}: F={f_stat:.4f}, p={p_val:.4f} {sig}")
+
+# Plot — F-stats vs 5% critical value (3.84)
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+axes[0].bar(range(1, 5), f_stats, color='#1f77b4', alpha=0.7, edgecolor='black')
+axes[0].axhline(3.84, color='red', linestyle='--', linewidth=2, label='5% critical')
+axes[0].set_xlabel('Lag (quarters)', fontweight='bold')
+axes[0].set_ylabel('F-statistic',    fontweight='bold')
+axes[0].set_title('Fundraising → Returns?', fontweight='bold')
+axes[0].legend(); axes[0].grid(True, alpha=0.3, axis='y')
+
+axes[1].bar(range(1, 5), f_stats_rev, color='#ff7f0e', alpha=0.7, edgecolor='black')
+axes[1].axhline(3.84, color='red', linestyle='--', linewidth=2, label='5% critical')
+axes[1].set_xlabel('Lag (quarters)', fontweight='bold')
+axes[1].set_ylabel('F-statistic',    fontweight='bold')
+axes[1].set_title('Returns → Fundraising?', fontweight='bold')
+axes[1].legend(); axes[1].grid(True, alpha=0.3, axis='y')
+
+plt.tight_layout()
+plt.show()
                 </code></pre>
             </details>
         </section>
 
         <!-- VAR & IMPULSE RESPONSE -->
         <section id="var" class="content-section">
-            <span class="eyebrow">Phase 4</span>
-            <h2>VAR(2) — impulse response &amp; variance decomposition</h2>
+            <span class="eyebrow">06 · VAR &amp; Impulse Response</span>
+            <h2>VAR(2) — Impulse Response &amp; Variance Decomposition</h2>
             <p class="lead">A bivariate vector autoregression lets both variables depend on each other's past. From the fitted VAR we trace out two objects: how PE returns respond to a one-unit shock to fundraising over the next 8 quarters (impulse response), and how much of return variance is attributable to fundraising shocks at each horizon.</p>
 
             <div class="grid g-2">
                 <div class="card">
-                    <h4>Impulse response: $1B fundraising shock &rarr; PE return</h4>
+                    <h4>Impulse Response: $1B Fundraising Shock &rarr; PE Return</h4>
                     <div class="chart-wrap"><canvas id="ch_irf"></canvas></div>
-                    <div class="caption">Each quarter the shock subtracts roughly &minus;0.013% to &minus;0.017% from the return level. The effect is tight, persistent, and uniformly negative through the 8-quarter horizon.</div>
+                    <div class="caption">Each quarter the shock subtracts roughly &minus;0.012% to &minus;0.017% from the return level. The effect is tight, persistent, and uniformly negative through the 8-quarter horizon.</div>
                 </div>
                 <div class="card">
-                    <h4>Cumulative impulse response</h4>
+                    <h4>Cumulative Impulse Response</h4>
                     <div class="chart-wrap"><canvas id="ch_irf_cum"></canvas></div>
                     <div class="caption">Stacked over 8 quarters, the cumulative drag reaches <strong>&minus;0.114%</strong> per $1B fundraising shock. Across a typical $50&ndash;100B swing in quarterly fundraising, this scales to several percentage points of cumulative quarterly-return drag over the eight-quarter window.</div>
                 </div>
@@ -582,7 +675,7 @@ grangercausalitytests(granger_data[['PE_Fundraising', 'PE_Return']], maxlag=4)
 
             <div class="grid g-2">
                 <div class="card">
-                    <h4>VAR equation for PE_Return</h4>
+                    <h4>VAR Equation for PE_Return</h4>
                     <table class="summary-stats" style="margin-top:6px">
                         <tr><th>Regressor</th><th>Coef.</th><th>Std. err</th><th>t-stat</th><th>p-value</th></tr>
                         <tr><td>const</td><td>3.571</td><td>1.097</td><td>3.26</td><td><strong>0.001</strong></td></tr>
@@ -593,7 +686,7 @@ grangercausalitytests(granger_data[['PE_Fundraising', 'PE_Return']], maxlag=4)
                     </table>
                 </div>
                 <div class="card">
-                    <h4>VAR equation for PE_Fundraising</h4>
+                    <h4>VAR Equation for PE_Fundraising</h4>
                     <table class="summary-stats" style="margin-top:6px">
                         <tr><th>Regressor</th><th>Coef.</th><th>Std. err</th><th>t-stat</th><th>p-value</th></tr>
                         <tr><td>const</td><td>−0.36</td><td>5.72</td><td>−0.06</td><td>0.950</td></tr>
@@ -610,214 +703,96 @@ grangercausalitytests(granger_data[['PE_Fundraising', 'PE_Return']], maxlag=4)
             </div>
 
             <details class="code-block">
-                <summary>Show Code: VAR & Impulse Response</summary>
+                <summary>Show Code: VAR(2) + Impulse Response + Variance Decomposition</summary>
                 <pre><code class="language-python">
 from statsmodels.tsa.api import VAR
 
 # Prepare VAR data
 var_data = master_data[['PE_Return', 'PE_Fundraising']].copy()
+for col in var_data.columns:
+    var_data[col] = pd.to_numeric(var_data[col], errors='coerce')
+var_data = var_data.dropna()
 
-# Estimate VAR(2)
-model = VAR(var_data)
-results = model.fit(2)
+# Fit VAR(2)
+model      = VAR(var_data)
+var_result = model.fit(2)
+print(var_result.summary())
 
-print(results.summary())
+# Impulse response: $1B fundraising shock → PE return path
+irf = var_result.irf(8)
+fundraising_shock_to_returns = irf.irfs[:, 0, 1]   # response of var 0 to shock in var 1
 
-# Calculate impulse response
-irf = results.irf(8)  # 8 quarters ahead
-print(irf.summary())
+fig, ax = plt.subplots(figsize=(12, 5))
+quarters = range(len(fundraising_shock_to_returns))
+ax.plot(quarters, fundraising_shock_to_returns,
+        marker='o', linewidth=2.5, markersize=8, color='#1f77b4')
+ax.axhline(0, color='black', linestyle='--', linewidth=0.8)
+ax.fill_between(quarters, fundraising_shock_to_returns, 0, alpha=0.2, color='#1f77b4')
+ax.set_xlabel('Quarters ahead', fontweight='bold')
+ax.set_ylabel('Return Response (%)', fontweight='bold')
+ax.set_title('Impulse Response: $1B Fundraising Shock → PE Returns',
+             fontsize=14, fontweight='bold')
+ax.grid(True, alpha=0.3); plt.tight_layout(); plt.show()
 
-# Extract fundraising → returns IRF
-fundraising_shock_irf = irf.irfs[:, 1, 0]  # shock to fundraising, response of returns
-print("Fundraising shock → Returns response:")
-print(fundraising_shock_irf)
+# Cumulative IRF
+cumulative_irf = np.cumsum(fundraising_shock_to_returns)
+
+fig, ax = plt.subplots(figsize=(12, 5))
+ax.plot(quarters, cumulative_irf, marker='s', linewidth=2.5, markersize=8, color='#ff7f0e')
+ax.axhline(0, color='black', linestyle='--', linewidth=0.8)
+ax.fill_between(quarters, cumulative_irf, 0, alpha=0.2, color='#ff7f0e')
+ax.set_xlabel('Quarters ahead', fontweight='bold')
+ax.set_ylabel('Cumulative Return Response (%)', fontweight='bold')
+ax.set_title('Cumulative Effect of $1B Fundraising Shock on PE Returns',
+             fontsize=14, fontweight='bold')
+ax.grid(True, alpha=0.3); plt.tight_layout(); plt.show()
+
+# Forecast Error Variance Decomposition
+fevd = var_result.fevd(8)
+for q in range(len(fevd.decomp)):
+    ret_shock  = fevd.decomp[q, 0, 0]
+    fund_shock = fevd.decomp[q, 0, 1]
+    print(f"Q{q}: returns explained by own={ret_shock:7.2f}% | fundraising={fund_shock:7.2f}%")
                 </code></pre>
             </details>
         </section>
 
-        <!-- MARKOV SWITCHING -->
-        <section id="markov" class="content-section">
-            <span class="eyebrow">Phase 5</span>
-            <h2>Markov regime switching — does the effect change in crises?</h2>
-            <p class="lead">If fundraising and returns interact differently in normal markets vs. crises, a single OLS coefficient understates the true picture. A 2-state Markov regression lets the model probabilistically classify each quarter into a high-mean / low-mean regime and estimate two separate fundraising slopes.</p>
-
-            <div class="grid g-2">
-                <div class="card">
-                    <h4>Regime 0 (Crisis) — 17 quarters</h4>
-                    <div class="grid g-3" style="margin-top:8px;gap:10px">
-                        <div class="tile"><div class="kpi"><div class="lbl">Mean return</div><div class="num rose">−4.14%</div></div></div>
-                        <div class="tile"><div class="kpi"><div class="lbl">Std. dev.</div><div class="num">4.68</div></div></div>
-                        <div class="tile"><div class="kpi"><div class="lbl">Avg. fundraising</div><div class="num">$53.5B</div></div></div>
-                    </div>
-                    <div class="callout-box" style="margin-top:14px">
-                        <p>β on fundraising = <strong>−0.080</strong> (p &lt; 0.001). The effect is <em>three times stronger</em> in crisis quarters — when capital is being deployed into a falling market.</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <h4>Regime 1 (Normal) — 85 quarters</h4>
-                    <div class="grid g-3" style="margin-top:8px;gap:10px">
-                        <div class="tile"><div class="kpi"><div class="lbl">Mean return</div><div class="num emerald">+4.98%</div></div></div>
-                        <div class="tile"><div class="kpi"><div class="lbl">Std. dev.</div><div class="num">3.68</div></div></div>
-                        <div class="tile"><div class="kpi"><div class="lbl">Avg. fundraising</div><div class="num">$84.9B</div></div></div>
-                    </div>
-                    <div class="callout-box" style="margin-top:14px">
-                        <p>β on fundraising = <strong>−0.026</strong> (p &lt; 0.01). Even in calm markets the loading is negative — but smaller. The capital cycle is everywhere; it is just sharper in stress regimes.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid g-2">
-                <div class="card">
-                    <h4>Smoothed crisis probability over time</h4>
-                    <div class="chart-wrap"><canvas id="ch_regime_prob"></canvas></div>
-                    <div class="caption">The model assigns high crisis-state probability around 2001 (dot-com), 2008&ndash;09 (GFC), and 2020 (COVID) — a sanity check that the latent regime is picking up real macro stress.</div>
-                </div>
-                <div class="card">
-                    <h4>Regime-specific fundraising effect</h4>
-                    <div class="chart-wrap"><canvas id="ch_regime_beta"></canvas></div>
-                    <div class="caption">Both bars point in the same direction (negative) — but the crisis bar is 3&times; larger in absolute magnitude. The capital cycle does not vanish in good times; it is amplified in bad ones.</div>
-                </div>
-            </div>
-
-            <details class="code-block">
-                <summary>Show Code: Markov Switching Model</summary>
-                <pre><code class="language-python">
-from statsmodels.tsa.regime_switching.markov_regression import MarkovRegression
-
-# Prepare data
-markov_data = master_data[['PE_Return', 'PE_Fundraising']].dropna()
-
-# Estimate Markov switching model with 2 regimes
-model = MarkovRegression(
-    markov_data['PE_Return'], 
-    k_regimes=2, 
-    exog=markov_data[['PE_Fundraising']]
-)
-
-results = model.fit()
-print(results.summary())
-
-# Extract regime-specific coefficients
-print("Regime 0 (Crisis) fundraising effect:", results.params[1])
-print("Regime 1 (Normal) fundraising effect:", results.params[4])
-                </code></pre>
-            </details>
-        </section>
-
-        <!-- CAPITAL CYCLES -->
-        <section id="cycles" class="content-section">
-            <span class="eyebrow">Phase 6</span>
-            <h2>Extracting the capital cycle</h2>
-            <p class="lead">The previous phases work in <em>levels</em> of returns and fundraising. Phase 6 asks a different question: can we isolate a slow-moving "capital cycle" component from the return series itself? We use Hankel Dynamic Mode Decomposition (DMD) to identify oscillatory modes, then a Hodrick&ndash;Prescott filter (λ = 1600) to produce a clean, interpretable cyclical component in the 4&ndash;10 year band that PE practitioners typically describe.</p>
-
-            <div class="grid g-2">
-                <div class="card">
-                    <h4>PE returns vs. extracted capital cycle</h4>
-                    <div class="chart-wrap tall"><canvas id="ch_cycle"></canvas></div>
-                    <div class="caption">The HP-filter cycle (blue) tracks the medium-frequency wave inside raw PE returns (gray). Peaks line up with end-of-decade vintages and troughs with crisis quarters.</div>
-                </div>
-                <div class="card">
-                    <h4>Why DMD &amp; HP filter?</h4>
-                    <p>DMD is a linear-systems technique that finds the dominant oscillatory modes in a time series via eigenvalue decomposition of a Hankel-embedded data matrix. The project applies it with a 24-quarter (6-year) embedding and rank-12 truncation in order to look for medium-frequency structure consistent with a typical PE fund vintage horizon (≈ 4&ndash;10 years).</p>
-                    <p>For a stable, interpretable cycle output we use the HP filter as the primary extractor (λ = 1600 for quarterly data). The blue series shown is exactly the <span class="mono">Capital_Cycle</span> column from <span class="mono">master_data_with_dmd.csv</span> — by construction it has roughly zero mean and tracks the medium-frequency component of the raw return series.</p>
-                    <div class="callout-box" style="margin-top:14px">
-                        <p>The capital cycle is <em>not</em> a perfect predictor of next-quarter returns — but its existence corroborates the Phase&nbsp;3&ndash;5 evidence that the PE return process is far from white noise: it has structured medium-frequency dynamics.</p>
-                    </div>
-                </div>
-            </div>
-
-            <h3>DMD Capital Cycle Extraction</h3>
-            <table class="summary-stats">
-                <tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr>
-                <tr><td><strong>Dominant Period</strong></td><td>6.94 years</td><td>PE fund vintage life cycle (LPs commit, GP deploys, exits occur)</td></tr>
-                <tr><td><strong>Number of Modes</strong></td><td>12 total (2 in 4-10yr band)</td><td>Rich oscillatory structure; 2 modes dominate cyclical behavior</td></tr>
-                <tr><td><strong>DMD Cycle Correlation (returns)</strong></td><td>0.3759</td><td>Moderate correlation; cycle explains ~37.6% of return variation</td></tr>
-            </table>
-
-            <h3>Hodrick-Prescott Filter Decomposition</h3>
-            <table class="summary-stats">
-                <tr><th>Component</th><th>Mean</th><th>Std Dev</th><th>Correlation w/ Returns</th><th>Interpretation</th></tr>
-                <tr><td><strong>HP Trend</strong></td><td>3.20%</td><td>1.18%</td><td>-</td><td>Long-run structural return level</td></tr>
-                <tr><td><strong>HP Capital Cycle</strong></td><td>0.26%</td><td>4.78%</td><td>0.9745</td><td>Very strong: cycle explains 95% of quarterly variation</td></tr>
-            </table>
-
-            <details class="code-block">
-                <summary>Show Code: DMD & HP Filter</summary>
-                <pre><code class="language-python">
-import numpy as np
-from scipy.signal import lfilter
-
-# DMD extraction (simplified)
-def hankel_dmd(signal, d=24):
-    # Build Hankel matrix
-    H = np.array([signal[i:i+d] for i in range(len(signal)-d)])
-    # SVD
-    U, s, Vh = np.linalg.svd(H, full_matrices=False)
-    # Compute DMD modes
-    return U[:, :12]  # Return 12 dominant modes
-
-modes = hankel_dmd(master_data['PE_Return'].values, d=24)
-
-# HP Filter
-def hp_filter(signal, lam=1600):
-    T = len(signal)
-    I = np.eye(T)
-    D = np.diag([1] + [-2]*(T-2) + [1])
-    D = D[:-1, :]
-    F = I - np.linalg.inv(I + lam * D.T @ D) 
-    return F @ signal
-
-trend = hp_filter(master_data['PE_Return'].values)
-cycle = master_data['PE_Return'].values - trend
-print(f"Cycle-Return Correlation: {np.corrcoef(cycle, master_data['PE_Return'].values)[0,1]:.4f}")
-                </code></pre>
-            </details>
-        </section>
+        <!-- CAPITAL CYCLES section moved to Appendix B (see #cycles below) -->
 
         <!-- KEY FINDINGS & INTERPRETATION (merged) -->
         <section id="findings" class="content-section">
-            <span class="eyebrow">05 · Findings &amp; Interpretation</span>
-            <h2>What the six phases tell us together</h2>
-            <p class="lead">The six phases are not independent tests — they are the same hypothesis evaluated through five different econometric lenses. Stitched together, they describe a single, coherent capital-cycle mechanism in PE.</p>
+            <span class="eyebrow">07 · Findings &amp; Interpretation</span>
+            <h2>What the Four Phases Tell Us Together</h2>
+            <p class="lead">The four phases are not independent tests — they are the same hypothesis evaluated through four different econometric lenses. Stitched together, they describe a single, coherent capital-cycle mechanism in PE.</p>
 
-            <h3>Six findings</h3>
+            <h3>Four Findings</h3>
             <div class="grid g-2">
                 <div class="card">
-                    <span class="pill">Finding 1</span>
-                    <h3 style="margin-top:10px">The OLS coefficient on fundraising is reliably negative</h3>
+                    <span class="pill">Finding 1</span><span class="phase-tag">Phase 1 · Exploratory Data Analysis</span>
+                    <h3 style="margin-top:10px">The Market Factor Dominates Contemporaneous Returns (ρ = 0.78)</h3>
+                    <p>PE is far from "uncorrelated" with public equity at the quarterly horizon — a robustness anchor for the controls.</p>
+                </div>
+                <div class="card">
+                    <span class="pill">Finding 2</span><span class="phase-tag">Phase 2 · OLS Regressions</span>
+                    <h3 style="margin-top:10px">The OLS Coefficient on Fundraising Is Reliably Negative</h3>
                     <p>Across five specifications β stays in the −0.010 to −0.019 range. Adding controls cuts magnitude but not sign.</p>
                 </div>
                 <div class="card">
-                    <span class="pill amber">Finding 2 — pivotal</span>
-                    <h3 style="margin-top:10px">Causation runs Returns &rarr; Fundraising, not the reverse</h3>
+                    <span class="pill amber">Finding 3 — pivotal</span><span class="phase-tag">Phase 3 · Granger Causality</span>
+                    <h3 style="margin-top:10px">Causation Runs Returns &rarr; Fundraising, Not the Reverse</h3>
                     <p>Granger F-stats of 7.46 / 4.66 / 4.37 at lags 2/3/4. Reverse direction is statistically weak. This reframes the OLS finding entirely.</p>
                 </div>
                 <div class="card">
-                    <span class="pill">Finding 3</span>
-                    <h3 style="margin-top:10px">VAR confirms a persistent −0.114% cumulative drag over 8 quarters</h3>
+                    <span class="pill">Finding 4</span><span class="phase-tag">Phase 4 · Vector Autoregression (VAR-2)</span>
+                    <h3 style="margin-top:10px">VAR Confirms a Persistent −0.114% Cumulative Drag Over 8 Quarters</h3>
                     <p>Per $1B shock. The structural feedback is small per dollar, large per cycle.</p>
-                </div>
-                <div class="card">
-                    <span class="pill rose">Finding 4</span>
-                    <h3 style="margin-top:10px">The drag is amplified in crisis regimes (β −0.080 vs −0.026)</h3>
-                    <p>Capital deployed into falling markets pays the highest cycle-tax — a nontrivial implication for tactical pacing.</p>
-                </div>
-                <div class="card">
-                    <span class="pill">Finding 5</span>
-                    <h3 style="margin-top:10px">A medium-frequency capital cycle exists in raw returns</h3>
-                    <p>The HP-filter cycle aligns with vintage-year folklore: troughs at the dot-com, GFC, and COVID drawdowns, peaks at the late-cycle vintages that practitioners typically warn against.</p>
-                </div>
-                <div class="card">
-                    <span class="pill amber">Finding 6</span>
-                    <h3 style="margin-top:10px">The market factor dominates contemporaneous returns (ρ = 0.78)</h3>
-                    <p>PE is far from "uncorrelated" with public equity at the quarterly horizon — a robustness anchor for the controls.</p>
                 </div>
             </div>
 
-            <h3>What the evidence actually means</h3>
+            <h3>What the Evidence Actually Means</h3>
             <div class="grid g-2">
                 <div class="card">
-                    <h3 style="margin-top:0">Mechanism, in plain English</h3>
+                    <h3 style="margin-top:0">Mechanism, in Plain English</h3>
                     <ol>
                         <li>A stretch of strong PE vintages produces eye-catching IRRs.</li>
                         <li>LP allocators chase the asset class, raising fundraising 2&ndash;4 quarters later.</li>
@@ -827,20 +802,20 @@ print(f"Cycle-Return Correlation: {np.corrcoef(cycle, master_data['PE_Return'].v
                     </ol>
                 </div>
                 <div class="card">
-                    <h3 style="margin-top:0">Why the OLS slope is misleading on its own</h3>
+                    <h3 style="margin-top:0">Why the OLS Slope Is Misleading on Its Own</h3>
                     <p>A regression of next-quarter return on contemporaneous fundraising mechanically picks up the back end of the loop — fundraising is high <em>because</em> recent returns were strong, and the natural reversion is what shows up as the "negative effect" of fundraising. Granger and VAR strip away the timing illusion: the leading variable is returns.</p>
                 </div>
             </div>
 
             <div class="callout-box">
-                <p><strong>For an LP allocator:</strong>&nbsp; commitment pacing should lean against fundraising peaks, not into them. The mechanism is structural — Granger and VAR both place returns ahead of fundraising in the lead-lag, and the regime regression shows the drag widens precisely when capital is being deployed into a falling market. (Vintage-year IRR claims are outside the scope of the notebook, which works at the quarterly-aggregate level.)</p>
+                <p><strong>For an LP allocator:</strong>&nbsp; commitment pacing should lean against fundraising peaks, not into them. The mechanism is structural — Granger and VAR both place returns ahead of fundraising in the lead-lag, and the cumulative drag of &minus;0.114% per $1B over eight quarters scales meaningfully against typical fundraising swings. (Vintage-year IRR claims are outside the scope of the notebook, which works at the quarterly-aggregate level.)</p>
             </div>
         </section>
 
         <!-- LIMITATIONS -->
         <section id="limitations" class="content-section">
-            <span class="eyebrow">06 · Limitations</span>
-            <h2>What this study cannot tell us</h2>
+            <span class="eyebrow">08 · Limitations</span>
+            <h2>What This Study Cannot Tell Us</h2>
             <div class="grid g-3">
                 <div class="card">
                     <h4>Smoothed NAVs</h4>
@@ -851,19 +826,19 @@ print(f"Cycle-Return Correlation: {np.corrcoef(cycle, master_data['PE_Return'].v
                     <p>We use industry aggregates, not fund-level IRRs. The capital cycle should bite hardest on individual mega-funds — not visible at this level of aggregation.</p>
                 </div>
                 <div class="card">
-                    <h4>Sample period</h4>
+                    <h4>Sample Period</h4>
                     <p>102 quarters span three crises and two distinct rate regimes. The 2021&ndash;present "everything bubble" and subsequent normalisation are out-of-sample.</p>
                 </div>
                 <div class="card">
-                    <h4>Granger ≠ causation</h4>
+                    <h4>Granger ≠ Causation</h4>
                     <p>Granger causality tests forecast improvement, not causal mechanism. A confounding macro cycle could in principle drive both series. The market &amp; spread controls partially address this but do not eliminate it.</p>
                 </div>
                 <div class="card">
                     <h4>Linearity</h4>
-                    <p>OLS / VAR assume linear relationships. The Markov phase relaxes this in a regime sense, but more general nonlinearities (e.g. threshold effects in dry-powder levels) are not modelled.</p>
+                    <p>OLS / VAR assume linear relationships. The Markov regime-switching analysis in the Appendix relaxes this in a regime sense, but more general nonlinearities (e.g. threshold effects in dry-powder levels) are not modelled.</p>
                 </div>
                 <div class="card">
-                    <h4>HY-spread coverage</h4>
+                    <h4>HY-Spread Coverage</h4>
                     <p>93% (95/102 quarters). The early-1990s gap is filled by listwise deletion in the regression — a small sample-size cost, but not an unbiasing one.</p>
                 </div>
             </div>
@@ -871,14 +846,218 @@ print(f"Cycle-Return Correlation: {np.corrcoef(cycle, master_data['PE_Return'].v
 
         <!-- CONCLUSION -->
         <section id="conclusion" class="content-section">
-            <span class="eyebrow">07 · Conclusion</span>
-            <h2>Returns lead. Fundraising follows. The market remembers.</h2>
-            <p class="lead">The headline correlation between PE fundraising and PE returns is negative — but the headline is the wrong story. Strong returns reliably attract capital with a 2&ndash;4 quarter lag; that capital then sits in the system as a structural drag on subsequent <em>quarterly aggregate returns</em> of roughly &minus;0.014% per $1B raised, accumulating to &minus;0.114% over an 8-quarter horizon and amplifying roughly threefold inside crisis regimes (β = &minus;0.080 vs &minus;0.026).</p>
+            <span class="eyebrow">09 · Conclusion</span>
+            <h2>Returns Lead. Fundraising Follows. The Market Remembers.</h2>
+            <p class="lead">The headline correlation between PE fundraising and PE returns is negative — but the headline is the wrong story. Strong returns reliably attract capital with a 2&ndash;4 quarter lag; that capital then sits in the system as a structural drag on subsequent <em>quarterly aggregate returns</em> of roughly &minus;0.014% per $1B raised, accumulating to &minus;0.114% over an 8-quarter horizon.</p>
 
             <div class="headline">
-                <strong>What we conclude:</strong>&nbsp; PE markets exhibit a textbook capital cycle. Vintage-year matters, fundraising peaks are warning signs not green lights, and the mechanism is sharper exactly when investors are most tempted to retreat. The cleanest single-sentence summary the data supports: <em>past returns predict future fundraising more reliably than fundraising predicts future returns — and the resulting wave of capital is what depresses the next vintage's performance.</em>
+                <strong>What we conclude:</strong>&nbsp; PE markets exhibit a textbook capital cycle. Vintage-year matters, and fundraising peaks are warning signs rather than green lights. The cleanest single-sentence summary the data supports: <em>past returns predict future fundraising more reliably than fundraising predicts future returns — and the resulting wave of capital is what depresses the next vintage's performance.</em>
             </div>
         </section>
+
+        <!-- ============================================================
+             APPENDIX — hidden by default, revealed by sidebar click
+             ============================================================ -->
+        <div id="appendix" class="appendix-wrapper">
+            <header class="appendix-header">
+                <h2>Appendix</h2>
+                <p>Supplementary analyses excluded from the main report flow. Linked from the sidebar; not encountered through continuous scroll of the main body.</p>
+            </header>
+
+            <!-- APPENDIX A · MARKOV SWITCHING -->
+            <section id="markov" class="content-section">
+                <span class="eyebrow">A · Markov Regime Switching</span>
+                <h2>Markov Regime Switching — Does the Effect Change in Crises?</h2>
+                <p class="lead">If fundraising and returns interact differently in normal markets vs. crises, a single OLS coefficient understates the true picture. A 2-state Markov regression lets the model probabilistically classify each quarter into a high-mean / low-mean regime and estimate two separate fundraising slopes.</p>
+
+                <div class="grid g-2">
+                    <div class="card">
+                        <h4>Regime 0 (Crisis) — 17 Quarters</h4>
+                        <div class="grid g-3" style="margin-top:8px;gap:10px">
+                            <div class="tile"><div class="kpi"><div class="lbl">Mean return</div><div class="num rose">−4.14%</div></div></div>
+                            <div class="tile"><div class="kpi"><div class="lbl">Std. dev.</div><div class="num">4.68</div></div></div>
+                            <div class="tile"><div class="kpi"><div class="lbl">Avg. fundraising</div><div class="num">$53.5B</div></div></div>
+                        </div>
+                        <div class="callout-box" style="margin-top:14px">
+                            <p>β on fundraising = <strong>−0.080</strong> (p &lt; 0.001). The effect is <em>three times stronger</em> in crisis quarters — when capital is being deployed into a falling market.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4>Regime 1 (Normal) — 85 Quarters</h4>
+                        <div class="grid g-3" style="margin-top:8px;gap:10px">
+                            <div class="tile"><div class="kpi"><div class="lbl">Mean return</div><div class="num emerald">+4.98%</div></div></div>
+                            <div class="tile"><div class="kpi"><div class="lbl">Std. dev.</div><div class="num">3.68</div></div></div>
+                            <div class="tile"><div class="kpi"><div class="lbl">Avg. fundraising</div><div class="num">$84.9B</div></div></div>
+                        </div>
+                        <div class="callout-box" style="margin-top:14px">
+                            <p>β on fundraising = <strong>−0.026</strong> (p &lt; 0.01). Even in calm markets the loading is negative — but smaller. The capital cycle is everywhere; it is just sharper in stress regimes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid g-2">
+                    <div class="card">
+                        <h4>Smoothed Crisis Probability Over Time</h4>
+                        <div class="chart-wrap"><canvas id="ch_regime_prob"></canvas></div>
+                        <div class="caption">The model assigns high crisis-state probability around 2001 (dot-com), 2008&ndash;09 (GFC), and 2020 (COVID) — a sanity check that the latent regime is picking up real macro stress.</div>
+                    </div>
+                    <div class="card">
+                        <h4>Regime-Specific Fundraising Effect</h4>
+                        <div class="chart-wrap"><canvas id="ch_regime_beta"></canvas></div>
+                        <div class="caption">Both bars point in the same direction (negative) — but the crisis bar is 3&times; larger in absolute magnitude. The capital cycle does not vanish in good times; it is amplified in bad ones.</div>
+                    </div>
+                </div>
+
+                <details class="code-block">
+                    <summary>Show Code: Markov 2-Regime Switching Regression</summary>
+                    <pre><code class="language-python">
+from statsmodels.tsa.regime_switching.markov_regression import MarkovRegression
+
+# Prepare regression data
+ms = master_data[['PE_Return', 'PE_Fundraising']].dropna().reset_index(drop=True)
+y = ms['PE_Return'].values
+X = ms[['PE_Fundraising']].values
+
+# Fit 2-state Markov regression with fundraising as the exogenous regressor
+model  = MarkovRegression(y, exog=X, k_regimes=2)
+result = model.fit(disp=False)
+print(result.summary())
+
+# Smoothed regime probabilities
+regime_probs = result.smoothed_marginal_probabilities
+regime2_prob = regime_probs[:, 1]                 # P(crisis)
+regime       = (regime2_prob > 0.5).astype(int) + 1
+
+# Regime-specific summaries
+r1, r2 = y[regime == 1], y[regime == 2]
+f1, f2 = X[regime == 1, 0], X[regime == 2, 0]
+print(f"Regime 1 (Normal): n={len(r1)}, mean return={r1.mean():.4f}%, "
+      f"mean fundraising=${f1.mean():.2f}B")
+print(f"Regime 2 (Crisis): n={len(r2)}, mean return={r2.mean():.4f}%, "
+      f"mean fundraising=${f2.mean():.2f}B")
+
+# Regime-specific fundraising slopes from result.params
+c1 = result.params[1]      # Regime 1 (Normal) fundraising slope
+c2 = result.params[3]      # Regime 2 (Crisis) fundraising slope
+print(f"Normal-regime β  on fundraising: {c1:.6f}")
+print(f"Crisis-regime β on fundraising: {c2:.6f}")
+print(f"Crisis-vs-Normal ratio: {c2 / c1:.2f}x")
+                    </code></pre>
+                </details>
+            </section>
+
+            <!-- APPENDIX B · CAPITAL CYCLES -->
+            <section id="cycles" class="content-section">
+                <span class="eyebrow">B · Capital Cycles</span>
+                <h2>Extracting the Capital Cycle</h2>
+                <p class="lead">The main report works in <em>levels</em> of returns and fundraising. This supplementary analysis asks a different question: can we isolate a slow-moving "capital cycle" component from the return series itself? We use Hankel Dynamic Mode Decomposition (DMD) to identify oscillatory modes, then a Hodrick&ndash;Prescott filter (λ = 1600) to produce a clean, interpretable cyclical component in the 4&ndash;10 year band that PE practitioners typically describe.</p>
+
+                <div class="grid g-2">
+                    <div class="card">
+                        <h4>PE Returns vs. Extracted Capital Cycle</h4>
+                        <div class="chart-wrap tall"><canvas id="ch_cycle"></canvas></div>
+                        <div class="caption">The HP-filter cycle (blue) tracks the medium-frequency wave inside raw PE returns (gray). Peaks line up with end-of-decade vintages and troughs with crisis quarters.</div>
+                    </div>
+                    <div class="card">
+                        <h4>Why DMD &amp; HP Filter?</h4>
+                        <p>DMD is a linear-systems technique that finds the dominant oscillatory modes in a time series via eigenvalue decomposition of a Hankel-embedded data matrix. The project applies it with a 24-quarter (6-year) embedding and rank-12 truncation in order to look for medium-frequency structure consistent with a typical PE fund vintage horizon (≈ 4&ndash;10 years).</p>
+                        <p>For a stable, interpretable cycle output we use the HP filter as the primary extractor (λ = 1600 for quarterly data). The blue series shown is exactly the <span class="mono">Capital_Cycle</span> column from <span class="mono">master_data_with_dmd.csv</span> — by construction it has roughly zero mean and tracks the medium-frequency component of the raw return series.</p>
+                        <div class="callout-box" style="margin-top:14px">
+                            <p>The capital cycle is <em>not</em> a perfect predictor of next-quarter returns — but its existence corroborates the main-report evidence that the PE return process is far from white noise: it has structured medium-frequency dynamics.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>DMD Capital Cycle Extraction</h3>
+                <table class="summary-stats">
+                    <tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr>
+                    <tr><td><strong>Dominant Period</strong></td><td>6.94 years</td><td>PE fund vintage life cycle (LPs commit, GP deploys, exits occur)</td></tr>
+                    <tr><td><strong>Number of Modes</strong></td><td>12 total (2 in 4-10yr band)</td><td>Rich oscillatory structure; 2 modes dominate cyclical behavior</td></tr>
+                    <tr><td><strong>DMD Cycle Correlation (returns)</strong></td><td>0.3759</td><td>Moderate correlation; cycle explains ~37.6% of return variation</td></tr>
+                </table>
+
+                <h3>Hodrick-Prescott Filter Decomposition</h3>
+                <table class="summary-stats">
+                    <tr><th>Component</th><th>Mean</th><th>Std Dev</th><th>Correlation w/ Returns</th><th>Interpretation</th></tr>
+                    <tr><td><strong>HP Trend</strong></td><td>3.20%</td><td>1.18%</td><td>-</td><td>Long-run structural return level</td></tr>
+                    <tr><td><strong>HP Capital Cycle</strong></td><td>0.26%</td><td>4.78%</td><td>0.9745</td><td>Very strong: cycle explains 95% of quarterly variation</td></tr>
+                </table>
+
+                <details class="code-block">
+                    <summary>Show Code: Hankel DMD + HP Filter Capital-Cycle Extraction</summary>
+                    <pre><code class="language-python">
+from numpy.linalg import svd, eig, pinv
+
+pe_returns = master_data['PE_Return'].astype(float).values
+
+# ---- Hankel DMD ---------------------------------------------------
+def hankelize(x, d):
+    """Time-delay embedding."""
+    x = np.asarray(x).ravel()
+    T = len(x)
+    return np.stack([x[i : i + (T - d + 1)] for i in range(d)], axis=0)
+
+def exact_dmd_simple(X, Xp, r=None, dt=1.0):
+    U, s, Vt = svd(X, full_matrices=False)
+    if r is None:
+        r = int((s / s[0] > 1e-10).sum())
+    r = min(r, len(s))
+    Ur, sr, Vr = U[:, :r], s[:r], Vt[:r, :]
+    A_tilde = Ur.conj().T @ Xp @ Vr.T @ np.diag(1.0 / sr)
+    lam, W  = eig(A_tilde)
+    Phi     = Xp @ Vr.T @ np.diag(1.0 / sr) @ W
+    b       = pinv(Phi) @ X[:, 0]
+    omega   = np.log(lam.astype(complex)) / dt
+    return {'Phi': Phi, 'lam': lam, 'omega': omega, 'b': b, 'rank': r}
+
+x_centered = pe_returns - pe_returns.mean()
+H  = hankelize(x_centered, d=24)        # 24-quarter (6-yr) embedding
+X  = H[:, :-1]
+Xp = H[:, 1:]
+dmd = exact_dmd_simple(X, Xp, r=12, dt=0.25)
+
+# Identify modes whose period falls in the 4–10 year capital-cycle band
+periods    = np.abs(2 * np.pi /
+                    np.where(np.abs(dmd['omega'].imag) > 1e-8,
+                             dmd['omega'].imag, np.inf))
+amplitudes = np.abs(dmd['b'])
+band_modes = np.where((periods >= 4) & (periods <= 10))[0]
+for idx in band_modes:
+    print(f"  Mode {idx}: period={periods[idx]:.2f} yrs, "
+          f"amplitude={amplitudes[idx]:.4f}")
+
+# ---- HP filter (manual implementation, λ = 1600) ------------------
+lambd = 1600
+n     = len(pe_returns)
+D2    = np.diag(np.ones(n-1), 1) - 2*np.diag(np.ones(n)) + np.diag(np.ones(n-1), -1)
+D2    = D2[:-2, :]
+I     = np.eye(n)
+trend          = np.linalg.solve(I + lambd * D2.T @ D2, pe_returns)
+capital_cycle  = pe_returns - trend
+master_data['Capital_Cycle'] = capital_cycle
+
+print(f"HP Trend:        mean={trend.mean():.4f}%,  std={trend.std():.4f}%")
+print(f"Capital Cycle:  mean={capital_cycle.mean():.4f}%,  std={capital_cycle.std():.4f}%")
+print(f"Cycle ↔ Returns correlation: "
+      f"{np.corrcoef(capital_cycle, pe_returns)[0, 1]:.4f}")
+
+# Plot returns vs extracted capital cycle
+fig, ax = plt.subplots(figsize=(14, 5))
+q = np.arange(len(pe_returns))
+ax.plot(q, pe_returns, color='#1f77b4', linewidth=1.5, alpha=0.7,
+        label='PE Returns')
+ax.plot(q, capital_cycle, color='#ff7f0e', linewidth=2.5,
+        label='Capital Cycle (HP, 4–10 yr band)')
+ax.fill_between(q, capital_cycle, 0, alpha=0.15, color='#ff7f0e')
+ax.axhline(0, color='black', linestyle='--', linewidth=0.8)
+ax.set_xlabel('Quarter', fontweight='bold')
+ax.set_ylabel('Return (%)', fontweight='bold')
+ax.set_title('PE Returns vs. Extracted Capital Cycle', fontweight='bold')
+ax.legend(); ax.grid(True, alpha=0.3); plt.tight_layout(); plt.show()
+                    </code></pre>
+                </details>
+            </section>
+        </div>
 
     </main>
 

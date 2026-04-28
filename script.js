@@ -8,87 +8,187 @@ document.addEventListener('DOMContentLoaded', function() {
         hljs.highlightElement(block);
     });
 
-    // ==================== CORRELATION MATRIX ====================
-    const correlationData = {
-        'PE_Return': [1.0, -0.155, 0.782, -0.526, -0.492, 0.158, 0.188, 0.169],
-        'PE_Fundraising': [-0.155, 1.0, -0.134, -0.051, -0.127, -0.326, -0.567, -0.319],
-        'market_excess_return': [0.782, -0.134, 1.0, -0.263, -0.353, -0.065, -0.028, -0.055],
-        'hy_spread': [-0.526, -0.051, -0.263, 1.0, 0.803, -0.292, -0.13, -0.294],
-        'vix': [-0.492, -0.127, -0.353, 0.803, 1.0, -0.057, 0.024, -0.058],
-        'risk_free_rate': [0.158, -0.326, -0.065, -0.292, -0.057, 1.0, 0.859, 0.997],
-        'rate_10y': [0.188, -0.567, -0.028, -0.13, 0.024, 0.859, 1.0, 0.86],
-        'fed_funds_rate': [0.169, -0.319, -0.055, -0.294, -0.058, 0.997, 0.86, 1.0]
-    };
+    // ==================== APPENDIX VIEW TOGGLE ====================
+    // The Appendix is rendered as a separate "page". The main-report sections
+    // and the page header are hidden whenever body.appendix-mode is set.
+    // Clicking the sidebar Appendix link enters that mode; clicking any other
+    // sidebar link exits it and scrolls back to the chosen main-report anchor.
+    const body = document.body;
 
-    const variables = ['PE_Return', 'PE_Fundraising', 'market_excess_return', 'hy_spread', 'vix', 'risk_free_rate', 'rate_10y', 'fed_funds_rate'];
-    const cleanLabels = ['PE Returns', 'PE Fundraising', 'Market Excess Return', 'HY Spread', 'VIX', 'Risk-Free Rate', '10Y Rate', 'Fed Funds Rate'];
-    
-    // Create lower triangular matrix (only lower half, no mirror)
-    const zReshaped = [];
-    const xLabels = cleanLabels;
-    const yLabels = cleanLabels;
-    
-    for (let i = 0; i < variables.length; i++) {
-        const row = [];
-        for (let j = 0; j <= i; j++) {
-            row.push(correlationData[variables[i]][j]);
-        }
-        zReshaped.push(row);
+    function enterAppendixMode() {
+        if (body.classList.contains('appendix-mode')) return;
+        body.classList.add('appendix-mode');
+        // Charts that were created while hidden need an explicit resize to
+        // compute correct dimensions on first reveal.
+        setTimeout(() => {
+            if (typeof Chart !== 'undefined' && Chart.instances) {
+                Object.values(Chart.instances).forEach(c => {
+                    try { c.resize(); } catch (err) {}
+                });
+            }
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }, 60);
     }
 
-    const heatmapTrace = {
-        z: zReshaped,
-        x: xLabels,
-        y: yLabels,
-        type: 'heatmap',
-        text: zReshaped.map(row => row.map(val => val.toFixed(3))),
-        texttemplate: '%{text}',
-        textfont: { size: 10, color: '#000000' },
-        colorscale: [
-            [0, 'rgba(178, 34, 34, 0.7)'],      // Dark red for -1
-            [0.25, 'rgba(220, 100, 100, 0.7)'], // Medium red
-            [0.5, 'rgba(255, 255, 255, 0.5)'],  // White for 0
-            [0.75, 'rgba(100, 150, 220, 0.7)'], // Medium blue
-            [1, 'rgba(25, 55, 180, 0.7)']       // Dark blue for 1
-        ],
-        zmid: 0,
-        zmin: -1,
-        zmax: 1,
-        showscale: true,
-        colorbar: {
-            title: 'Correlation',
-            thickness: 12,
-            len: 0.6,
-            tickfont: { size: 10 }
-        },
-        hovertemplate: '<b>%{y}</b> vs <b>%{x}</b><br>Correlation: %{z:.3f}<extra></extra>'
-    };
+    function exitAppendixMode() {
+        body.classList.remove('appendix-mode');
+    }
 
-    const layout = {
-        title: 'Correlation Matrix',
-        titlefont: { size: 18, color: '#000000', family: "'Cambria', 'Georgia', serif" },
-        xaxis: { 
-            side: 'bottom', 
-            tickangle: -45,
-            tickfont: { size: 10 },
-            showgrid: false,
-            zeroline: false
-        },
-        yaxis: { 
-            autorange: 'reversed',
-            tickfont: { size: 10 },
-            showgrid: false,
-            zeroline: false
-        },
-        width: 850,
-        height: 700,
-        margin: { bottom: 200, left: 200, top: 80, right: 120 },
-        plot_bgcolor: '#ffffff',
-        paper_bgcolor: '#ffffff',
-        font: { family: "'Cambria', 'Georgia', serif", size: 11 }
-    };
+    document.querySelectorAll('.toc a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const isAppendix = link.classList.contains('appendix-link');
+            if (isAppendix) {
+                e.preventDefault();
+                enterAppendixMode();
+            } else if (body.classList.contains('appendix-mode')) {
+                // Coming back to the main report from the appendix view.
+                e.preventDefault();
+                exitAppendixMode();
+                const targetSel = link.getAttribute('href');
+                setTimeout(() => {
+                    const tgt = document.querySelector(targetSel);
+                    if (tgt) tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 30);
+            }
+            // else: default in-page anchor scroll handles main-report navigation.
+        });
+    });
 
-    Plotly.newPlot('correlation-heatmap', [heatmapTrace], layout, { responsive: true, displayModeBar: false });
+    // Deep links: loading the page with an appendix anchor opens the
+    // appendix view directly.
+    const appendixHashes = ['#appendix', '#markov', '#cycles'];
+    if (appendixHashes.includes(window.location.hash)) {
+        enterAppendixMode();
+    }
+
+    // ==================== CORRELATION MATRIX ====================
+    // Custom CSS-grid heatmap.
+    //   - Diverging blue-red color scale (matches the rest of the report).
+    //   - Lower-triangle only; mirrored values in the upper triangle are
+    //     intentionally blank.
+    //   - Column labels render at the BOTTOM of the grid; row labels on the
+    //     left. A vertical legend bar runs the full height of the grid via a
+    //     flex sibling element styled in styles.css.
+    // Variable names match the data-table presentation order so the matrix
+    // labels and the data table read the same way.
+    const corrLabels = [
+        'PE Returns',
+        'PE Fundraising',
+        'Market Excess Return',
+        'HY Spread',
+        'VIX',
+        'Risk-Free Rate',
+        '10Y Rate',
+        'Fed Funds Rate'
+    ];
+    const corrMatrix = [
+      // PE Ret, PE Fund, MktExc, HY Spr, VIX,    RF,     10Y,    FedFnd
+      [  1.000, -0.155,  0.782, -0.526, -0.492,  0.158,  0.188,  0.169 ], // PE Returns
+      [ -0.155,  1.000, -0.134, -0.051, -0.127, -0.326, -0.567, -0.319 ], // PE Fundraising
+      [  0.782, -0.134,  1.000, -0.263, -0.353, -0.065, -0.028, -0.055 ], // Market Excess Return
+      [ -0.526, -0.051, -0.263,  1.000,  0.803, -0.292, -0.130, -0.294 ], // HY Spread
+      [ -0.492, -0.127, -0.353,  0.803,  1.000, -0.057,  0.024, -0.058 ], // VIX
+      [  0.158, -0.326, -0.065, -0.292, -0.057,  1.000,  0.859,  0.997 ], // Risk-Free Rate
+      [  0.188, -0.567, -0.028, -0.130,  0.024,  0.859,  1.000,  0.860 ], // 10Y Rate
+      [  0.169, -0.319, -0.055, -0.294, -0.058,  0.997,  0.860,  1.000 ]  // Fed Funds Rate
+    ];
+
+    function corrColor(v){
+        // Diverging blue-red scale that matches the rest of the report's
+        // chart palette (primary blue + warm-red accents).
+        //   v = +1 -> dark blue   (#1937b4)
+        //   v =  0 -> white       (#ffffff)
+        //   v = -1 -> dark red    (#b22222)
+        const m = Math.min(1, Math.abs(v));
+        let r, g, b;
+        if (v >= 0) {
+            // White -> dark blue
+            r = Math.round(255 + (25  - 255) * m);
+            g = Math.round(255 + (55  - 255) * m);
+            b = Math.round(255 + (180 - 255) * m);
+        } else {
+            // White -> dark red
+            r = Math.round(255 + (178 - 255) * m);
+            g = Math.round(255 + (34  - 255) * m);
+            b = Math.round(255 + (34  - 255) * m);
+        }
+        return `rgb(${r},${g},${b})`;
+    }
+
+    (function buildHeatmap(){
+        const root = document.getElementById('heatmap');
+        if (!root) return;
+        const n = corrLabels.length;
+        root.style.gridTemplateColumns = `auto repeat(${n}, 1fr)`;
+
+        // Single shared tooltip element (created once, reused on every hover).
+        let tooltip = document.getElementById('heatmap-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.id = 'heatmap-tooltip';
+            tooltip.className = 'heatmap-tooltip';
+            document.body.appendChild(tooltip);
+        }
+        function showTooltip(e, rowLabel, colLabel, v){
+            tooltip.innerHTML =
+                `<div class="tt-row"><strong>${rowLabel}</strong> &times; <strong>${colLabel}</strong></div>` +
+                `<div class="tt-row">Correlation: <strong>${v.toFixed(3)}</strong></div>`;
+            tooltip.style.opacity = '1';
+            moveTooltip(e);
+        }
+        function moveTooltip(e){
+            // Offset so the tooltip doesn't sit under the cursor.
+            const pad = 14;
+            tooltip.style.left = (e.pageX + pad) + 'px';
+            tooltip.style.top  = (e.pageY + pad) + 'px';
+        }
+        function hideTooltip(){
+            tooltip.style.opacity = '0';
+        }
+
+        // Body rows: row label (left) + lower-triangle data cells.
+        // The upper triangle is left blank so duplicate / mirrored values
+        // are not displayed.
+        for (let i = 0; i < n; i++){
+            const row = document.createElement('div');
+            row.className = 'hcell hhead';
+            row.textContent = corrLabels[i];
+            root.appendChild(row);
+            for (let j = 0; j < n; j++){
+                const c = document.createElement('div');
+                if (j > i) {
+                    // Upper triangle: blank cell (no value, no fill).
+                    c.className = 'hcell hempty';
+                } else {
+                    const v = corrMatrix[i][j];
+                    c.className = 'hcell';
+                    c.style.background = corrColor(v);
+                    // Flip text color on darker (high-magnitude) cells for
+                    // legibility against the saturated blue / red.
+                    c.style.color = Math.abs(v) > 0.55 ? '#fff' : '#000';
+                    c.textContent = v.toFixed(2);
+                    // Hover interactivity: row × column + correlation.
+                    const rowLabel = corrLabels[i];
+                    const colLabel = corrLabels[j];
+                    c.addEventListener('mouseenter', (e) => showTooltip(e, rowLabel, colLabel, v));
+                    c.addEventListener('mousemove', moveTooltip);
+                    c.addEventListener('mouseleave', hideTooltip);
+                }
+                root.appendChild(c);
+            }
+        }
+
+        // Bottom header row: empty corner cell + column labels.
+        const empty = document.createElement('div');
+        empty.className = 'hcell hhead';
+        root.appendChild(empty);
+        corrLabels.forEach(l => {
+            const c = document.createElement('div');
+            c.className = 'hcell hhead';
+            c.textContent = l;
+            root.appendChild(c);
+        });
+    })();
 
     // ==================== TIME SERIES CHART ====================
     const quarters = ["1995Q1", "1995Q2", "1995Q3", "1995Q4", "1996Q1", "1996Q2", "1996Q3", "1996Q4", "1997Q1", "1997Q2", "1997Q3", "1997Q4", "1998Q1", "1998Q2", "1998Q3", "1998Q4", "1999Q1", "1999Q2", "1999Q3", "1999Q4", "2000Q1", "2000Q2", "2000Q3", "2000Q4", "2001Q1", "2001Q2", "2001Q3", "2001Q4", "2002Q1", "2002Q2", "2002Q3", "2002Q4", "2003Q1", "2003Q2", "2003Q3", "2003Q4", "2004Q1", "2004Q2", "2004Q3", "2004Q4", "2005Q1", "2005Q2", "2005Q3", "2005Q4", "2006Q1", "2006Q2", "2006Q3", "2006Q4", "2007Q1", "2007Q2", "2007Q3", "2007Q4", "2008Q1", "2008Q2", "2008Q3", "2008Q4", "2009Q1", "2009Q2", "2009Q3", "2009Q4", "2010Q1", "2010Q2", "2010Q3", "2010Q4", "2011Q1", "2011Q2", "2011Q3", "2011Q4", "2012Q1", "2012Q2", "2012Q3", "2012Q4", "2013Q1", "2013Q2", "2013Q3", "2013Q4", "2014Q1", "2014Q2", "2014Q3", "2014Q4", "2015Q1", "2015Q2", "2015Q3", "2015Q4", "2016Q1", "2016Q2", "2016Q3", "2016Q4", "2017Q1", "2017Q2", "2017Q3", "2017Q4", "2018Q1", "2018Q2", "2018Q3", "2018Q4", "2019Q1", "2019Q2", "2019Q3", "2019Q4", "2020Q1", "2020Q2"];
@@ -119,10 +219,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const timeSeriesLayout = {
         title: 'PE Fundraising & Returns Over Time (1995-2020)',
         titlefont: { size: 18, color: '#000000', family: "'Cambria', 'Georgia', serif" },
-        xaxis: { 
-            title: 'Quarter',
+        xaxis: {
+            title: 'Year',
+            tickmode: 'array',
+            tickvals: ['1995Q1','1996Q1','1997Q1','1998Q1','1999Q1','2000Q1','2001Q1','2002Q1','2003Q1','2004Q1','2005Q1','2006Q1','2007Q1','2008Q1','2009Q1','2010Q1','2011Q1','2012Q1','2013Q1','2014Q1','2015Q1','2016Q1','2017Q1','2018Q1','2019Q1','2020Q1'],
+            ticktext: ['1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020'],
             tickangle: -45,
-            tickfont: { size: 9 },
+            tickfont: { size: 11 },
             showgrid: true,
             gridcolor: '#f0f0f0'
         },
@@ -143,11 +246,16 @@ document.addEventListener('DOMContentLoaded', function() {
             zerolinewidth: 1,
             zerolinecolor: 'rgba(200, 200, 200, 0.3)'
         },
-        width: 950,
-        height: 550,
+        width: 1100,
+        height: 640,
         margin: { bottom: 150, left: 100, top: 80, right: 100 },
-        plot_bgcolor: '#ffffff',
-        paper_bgcolor: '#ffffff',
+        shapes: [
+            { type: 'rect', xref: 'x', yref: 'paper', x0: '2001Q1', x1: '2001Q4', y0: 0, y1: 1, fillcolor: 'rgba(120,120,120,0.18)', line: { width: 0 }, layer: 'below' },
+            { type: 'rect', xref: 'x', yref: 'paper', x0: '2007Q4', x1: '2009Q2', y0: 0, y1: 1, fillcolor: 'rgba(120,120,120,0.18)', line: { width: 0 }, layer: 'below' },
+            { type: 'rect', xref: 'x', yref: 'paper', x0: '2020Q1', x1: '2020Q2', y0: 0, y1: 1, fillcolor: 'rgba(120,120,120,0.18)', line: { width: 0 }, layer: 'below' }
+        ],
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)',
         font: { family: "'Cambria', 'Georgia', serif", size: 11 },
         hovermode: 'x unified',
         legend: { x: 1.02, y: 1, xanchor: 'left', yanchor: 'top' },
@@ -156,20 +264,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     Plotly.newPlot('timeseries-chart', [barTrace, lineTrace], timeSeriesLayout, { responsive: true, displayModeBar: false });
 
-    // ==================== SCATTER PLOT: FUNDRAISING VS RETURNS ====================
-    
-    const scatterX = peFundraising;
-    const scatterY = peReturns;
+    // ==================== SCATTER PLOT: FUNDRAISING(t) VS RETURN(t+1) ====================
+    // Lag returns one quarter forward to match the prose and the notebook's
+    // np.polyfit(PE_Fundraising, PE_Return.shift(-1)) construction.
+    const scatterX = peFundraising.slice(0, -1);
+    const scatterY = peReturns.slice(1);
 
-    // Calculate trend line (simple linear regression)
+    // Calculate trend line (simple linear regression) on lagged pairs
     const n = scatterX.length;
     const sumX = scatterX.reduce((a, b) => a + b, 0);
     const sumY = scatterY.reduce((a, b) => a + b, 0);
     const sumXY = scatterX.reduce((sum, x, i) => sum + x * scatterY[i], 0);
     const sumX2 = scatterX.reduce((sum, x) => sum + x * x, 0);
-    
+    const sumY2 = scatterY.reduce((sum, y) => sum + y * y, 0);
+
     const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     const intercept = (sumY - slope * sumX) / n;
+    const corrLagged = (n * sumXY - sumX * sumY) /
+        Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
     
     const trendLineX = [Math.min(...scatterX), Math.max(...scatterX)];
     const trendLineY = trendLineX.map(x => slope * x + intercept);
@@ -202,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const scatterLayout = {
-        title: `Fundraising Predicts Returns? (Corr: ${(-0.232).toFixed(3)})`,
+        title: `Fundraising Predicts Returns? (Corr: ${corrLagged.toFixed(3)})`,
         xaxis: {
             title: 'PE Fundraising (t) [$Bn]',
             showgrid: true,
@@ -216,17 +328,25 @@ document.addEventListener('DOMContentLoaded', function() {
             zerolinewidth: 1,
             zerolinecolor: 'rgba(200, 200, 200, 0.5)'
         },
-        width: 850,
         height: 600,
         margin: { bottom: 100, left: 100, top: 80, right: 100 },
-        plot_bgcolor: 'rgba(240, 245, 251, 0.5)',
-        paper_bgcolor: '#ffffff',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)',
         font: { family: "'Cambria', 'Georgia', serif", size: 11 },
         hovermode: 'closest',
         legend: { x: 0.02, y: 0.98 }
     };
 
     Plotly.newPlot('scatter-chart', [scatterTrace, trendTrace], scatterLayout, { responsive: true, displayModeBar: false });
+
+    // Force responsive sizing on the centered scatter plot so it fits its
+    // max-width container on initial render (rather than waiting for resize).
+    setTimeout(() => {
+        const el = document.getElementById('scatter-chart');
+        if (el && typeof Plotly !== 'undefined') {
+            try { Plotly.Plots.resize(el); } catch (err) {}
+        }
+    }, 0);
 
     // ==================== SMOOTH SCROLL & CODE BLOCKS ====================
     
@@ -311,9 +431,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const P_CRISIS = [0.0448,0.0247,0.0129,0.0003,0.0033,0.0027,0.0031,0.0053,0.0565,0.0002,0.0006,0.0004,0.0004,0.0898,0.9184,0.0179,0.0051,0.0,0.005,0.0,0.0,0.7617,0.9025,0.9996,0.9997,0.9191,0.9999,0.99,0.994,0.9989,0.9994,0.9555,0.8171,0.0317,0.0066,0.0001,0.0035,0.0032,0.0073,0.0,0.0072,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0002,0.0,0.0002,0.0,0.9821,1.0,0.9201,0.0017,0.0002,0.0,0.0002,0.0044,0.0001,0.0,0.0001,0.0007,0.4611,0.0004,0.0,0.0048,0.0003,0.0,0.0007,0.0003,0.0002,0.0,0.0008,0.0,0.0063,0.0001,0.001,0.0003,0.0429,0.0003,0.001,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0003,0.0,0.0,0.0,0.0,0.0,0.0,0.0001,0.9933,0.0];
 
     const RECESSION_BANDS = [
-        { label: 'Dot-com', x0: '2001Q1', x1: '2001Q4', color: 'rgba(31,119,180,0.07)' },
-        { label: 'GFC',     x0: '2007Q4', x1: '2009Q2', color: 'rgba(31,119,180,0.10)' },
-        { label: 'COVID',   x0: '2020Q1', x1: '2020Q2', color: 'rgba(31,119,180,0.07)' }
+        { label: 'Dot-com', x0: '2001Q1', x1: '2001Q4', color: 'rgba(100,150,220,0.10)' },
+        { label: 'GFC',     x0: '2007Q4', x1: '2009Q2', color: 'rgba(100,150,220,0.14)' },
+        { label: 'COVID',   x0: '2020Q1', x1: '2020Q2', color: 'rgba(100,150,220,0.10)' }
     ];
 
     // ---- Plugin: shaded recession bands by quarter labels ----
@@ -343,11 +463,12 @@ document.addEventListener('DOMContentLoaded', function() {
     Chart.defaults.color = '#333';
     Chart.defaults.borderColor = 'rgba(0,0,0,.12)';
 
-    // Project palette
+    // Project palette — base blue (100,150,220) and base red (178,34,34)
+    // match the Plotly time-series chart in the Data section.
     const PAL = {
-        blue:       '#1f77b4',
-        blueSoft:   'rgba(31,119,180,0.18)',
-        blueLight:  '#a8c5e6',
+        blue:       'rgba(100,150,220,1)',
+        blueSoft:   'rgba(100,150,220,0.20)',
+        blueLight:  'rgba(100,150,220,0.45)',
         rose:       'rgba(178,34,34,0.85)',
         roseSoft:   'rgba(178,34,34,0.15)',
         gray:       '#8a8a8a',

@@ -174,7 +174,7 @@ a:hover {
 
 .callout-box p {
     margin: 0;
-    font-style: italic;
+    font-style: normal;
     color: var(--text-dark);
 }
 
@@ -555,18 +555,101 @@ figcaption {
 }
 
 /* =====================================================
-   CORRELATION HEATMAP CENTERING
+   CORRELATION HEATMAP CENTERING + LEGEND
    ===================================================== */
 
-#correlation-heatmap {
+.heatmap-container {
     display: flex;
+    /* Top-align so the legend sits at the top of the matrix's first data
+       row instead of stretching to the matrix's full height. */
+    align-items: flex-start;
     justify-content: center;
-    align-items: center;
-    margin: 40px auto !important;
+    gap: 18px;
+    margin: 40px auto;
+    max-width: 940px;
 }
 
-#correlation-heatmap > div {
-    margin: 0 auto !important;
+#heatmap {
+    flex: 0 0 auto;
+}
+
+.heatmap-legend {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
+    /* Legend height pinned to the matrix's data-cell area so the top of the
+       gradient aligns with the top of the first row and the bottom aligns
+       with the bottom of the last data row (above the column-label row). */
+    height: var(--heatmap-data-height);
+}
+
+.legend-track {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+.legend-bar {
+    width: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    /* Gradient mirrors corrColor():
+       top  = +1.0 dark blue, mid = 0 white, bottom = -1.0 dark red */
+    background: linear-gradient(
+        to bottom,
+        #1937b4 0%,
+        #6496dc 25%,
+        #ffffff 50%,
+        #dc6464 75%,
+        #b22222 100%
+    );
+}
+
+.legend-labels {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 11.5px;
+    color: #000;
+    line-height: 1;
+}
+
+.legend-labels li {
+    white-space: nowrap;
+}
+
+/* ---- Heatmap hover tooltip ---- */
+.heatmap-tooltip {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    background: #ffffff;
+    color: #000;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    padding: 8px 12px;
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 12.5px;
+    line-height: 1.45;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+    max-width: 280px;
+}
+
+.heatmap-tooltip .tt-row { white-space: nowrap; }
+.heatmap-tooltip .tt-row strong { font-weight: 700; }
+
+.heatmap .hcell { transition: filter 0.12s ease; }
+.heatmap .hcell:not(.hhead):not(.hempty):hover {
+    filter: brightness(0.9);
+    cursor: default;
 }
 
 /* =====================================================
@@ -604,9 +687,9 @@ figcaption {
     font-size: 16px;
     color: var(--text-dark);
     line-height: 1.7;
-    max-width: 800px;
     margin: 0 0 18px 0;
     font-family: 'Cambria', 'Georgia', serif;
+    text-align: justify;
 }
 
 .lead em {
@@ -720,6 +803,23 @@ figcaption {
 
 .pill.amber { color: #8a6d2b; border-color: #c9a65b; background-color: #fbf6e8; }
 .pill.rose  { color: #b22222; border-color: #d68a8a; background-color: #fbeded; }
+
+/* phase-tag — neutral companion pill that names the model behind a finding */
+.phase-tag {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid var(--border-light);
+    color: #555;
+    background-color: #f7f7f5;
+    font-family: 'Cambria', 'Georgia', serif;
+    vertical-align: middle;
+}
 
 /* headline (large emphasis call-out) */
 .headline {
@@ -855,4 +955,122 @@ figcaption {
     .card { padding: 16px 18px; }
     .chart-wrap { height: 260px; }
     .chart-wrap.tall { height: 320px; }
+}
+
+/* =====================================================
+   APPENDIX - rendered as a separate "page" view, never
+   reachable by continuous scroll. Body gets .appendix-mode
+   when the user clicks the Appendix link in the sidebar;
+   any other sidebar link clears it.
+   ===================================================== */
+.appendix-wrapper {
+    display: none;
+    padding-top: 30px;
+}
+
+/* In appendix mode: hide every main-report section (and the page header),
+   show the appendix wrapper. */
+body.appendix-mode .header,
+body.appendix-mode > .main-content > section.content-section {
+    display: none !important;
+}
+
+body.appendix-mode .appendix-wrapper {
+    display: block;
+}
+
+.appendix-header {
+    margin-bottom: 40px;
+    padding: 0 50px;
+}
+
+.appendix-header h2 {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 32px;
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.appendix-header p {
+    color: var(--text-dark);
+    font-size: 15px;
+    line-height: 1.7;
+    font-family: 'Cambria', 'Georgia', serif;
+    max-width: 720px;
+}
+
+/* Sidebar TOC: visual divider before the Appendix link */
+.toc-divider {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.toc a.appendix-link {
+    color: var(--primary-blue);
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+.toc a.appendix-link::before {
+    content: '↳ ';
+    color: var(--primary-blue);
+    opacity: 0.7;
+}
+
+/* =====================================================
+   CORRELATION HEATMAP - custom CSS-grid implementation
+   imported from the alternate pe_capital_cycle output.
+   Magnitude encoded as gray scale; sign encoded
+   typographically (italic for negative).
+   ===================================================== */
+.heatmap {
+    display: grid;
+    gap: 0;
+    font-size: 11.5px;
+    border-radius: 0;
+    overflow: hidden;
+    border: none;
+    background: transparent;
+    /* Standardized data-cell size: every data column is 80px wide and every
+       data row is 40px tall. Leftmost column (row labels) sizes to its
+       longest label; bottom row (column labels) sizes to its wrapped text.
+       JS sets gridTemplateColumns inline; !important locks it here. */
+    grid-template-columns: auto repeat(8, 80px) !important;
+    grid-template-rows: repeat(8, 40px) auto;
+}
+
+/* Total data-rows height (8 × 40px) — consumed by the legend so its
+   top/bottom align exactly with the top of the first row and bottom of
+   the last data row (excluding the bottom column-label row). */
+:root {
+    --heatmap-data-height: 320px;
+}
+
+.heatmap .hcell {
+    padding: 9px 6px;
+    text-align: center;
+    font-family: 'Cambria', 'Georgia', serif;
+    color: #000;
+    font-weight: 400;
+    background: #fff;
+}
+
+.heatmap .hhead {
+    background: transparent !important;
+    color: #000;
+    font-weight: 400;
+    font-family: 'Cambria', 'Georgia', serif;
+    letter-spacing: 0.2px;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: normal;        /* allow long names to wrap */
+    word-break: keep-all;
+    padding: 8px 8px;
+}
+
+/* Upper-triangle cells: blank, no fill, no bordering visible. */
+.heatmap .hempty {
+    background: transparent;
 }
